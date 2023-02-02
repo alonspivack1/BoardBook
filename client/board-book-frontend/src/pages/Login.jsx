@@ -10,7 +10,7 @@ import axios from "axios";
 import { loginRoute } from '../utils/APIRoutes';
 
 
-export default function Register() {
+export default function Login() {
 
     const navigate = useNavigate();
 
@@ -26,6 +26,13 @@ export default function Register() {
         draggable: true,
         theme: "dark"
         }
+
+
+        useEffect(() => {
+          if (localStorage.getItem("board-book-user")) {
+          navigate("/");
+          }}, [] );
+
     const handleSubmit = async (event)=>{
         event.preventDefault();
         if(handleValidation())
@@ -68,7 +75,7 @@ export default function Register() {
         <form action="" onSubmit={(event) => handleSubmit(event)}>
           <div className="brand">
             <img src={Logo} alt="logo" />
-            <h1>snappy</h1>
+            <h1>Board Book</h1>
           </div>
           <input
             type="text"
