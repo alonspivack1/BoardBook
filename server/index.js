@@ -44,7 +44,6 @@ const io = socket(server,
     });
     global.onlineUsers = new Map();
     io.on("connection",(socket)=>{
-        global.chatSocket = socket;
         
         socket.on("add-user",(userId)=>
         {
@@ -55,7 +54,7 @@ const io = socket(server,
             const sendUserSocket = onlineUsers.get(data.to)
             if(sendUserSocket)
             {
-                socket.to(sendUserSocket).emit("msg-receive",data.message)
+                socket.to(sendUserSocket).emit("msg-receive",data)
             }
         }
         )

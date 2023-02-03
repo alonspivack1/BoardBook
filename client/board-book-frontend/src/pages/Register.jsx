@@ -42,7 +42,7 @@ export default function Register() {
             console.log("in Validation",registerRoute)
             const { username, email, password} = values;
                 const {data} = await axios.post(registerRoute,
-                    {username,password,email});
+                    {username,password,email}).catch();
             if (data.status===false)
             {
                 toast.error(data.msg,toastOptions);

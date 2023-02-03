@@ -4,13 +4,14 @@ import ChatInput from "./ChatInput";
 import Logout from "./Logout";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import { sendMessageRoute, recieveMessageRoute } from "../utils/APIRoutes";
+import { sendMessageRoute, recieveMessageRoute} from "../utils/APIRoutes";
 
 
 export default function ChatContainer({ currentUser,currentChat,socket}) {
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
+  const messageSentStatus = useRef(false);
 
 
   useEffect(() => {
@@ -47,18 +48,26 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
       from: data._id,
       to: currentChat._id,
       message: msg,
-    });
-    socket.current.emit("send-msg",
+    }).then((response) => {
+      messageSentStatus.current = response.data.sentSuccessfully
+    }).catch((error)=>alert("ERROR: NETWORK ERROR!"))
+    if (messageSentStatus.current)
     {
-      to:currentChat._id,
-      from:currentUser._id,
-      message:msg,
-    });
-
-
-    const msgs = [...messages];
-    msgs.push({ fromSelf: true, message: msg });
-    setMessages(msgs);
+      socket.current.emit("send-msg",
+      {
+        to:currentChat._id,
+        from:currentUser._id,
+        message:msg,
+      });
+  
+  
+      const msgs = [...messages];
+      msgs.push({ fromSelf: true, message: msg });
+      setMessages(msgs);
+    }
+    else{
+      alert("Error!, message didnt sent")
+    }
   };
 
   useEffect(()=>{
@@ -66,8 +75,11 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
     {
       socket.current.on("msg-receive",(msg)=>
       {
-        console.log(`hey -> ${process.env.REACT_APP_TAP}`)
-        setArrivalMessage({fromSelf: false, message:msg})
+        if(msg.from===currentChat._id)
+         setArrivalMessage({fromSelf: false, message:msg.message})
+         else{
+          alert(msg.from+" sent message for you!")
+         }
       })
     }
   })

@@ -5,9 +5,10 @@ module.exports.getMessages = async (req, res, next) => {
     const { from, to } = req.body;
 
     const messages = await Messages.find({
-      users: {
+      users: { 
         $all: [from, to],
-      },
+        $size: 2 
+      } 
     }).sort({ updatedAt: 1 });
 
     const projectedMessages = messages.map((msg) => {
@@ -31,8 +32,8 @@ module.exports.addMessage = async (req, res, next) => {
       sender: from,
     });
 
-    if (data) return res.json({ msg: "Message added successfully." });
-    else return res.json({ msg: "Failed to add message to the database" });
+    if (data) return res.json({ sentSuccessfully:true});
+    else return res.json({ sentSuccessfully: false});
   } catch (ex) {
     next(ex);
   }
