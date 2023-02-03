@@ -66,14 +66,17 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
     {
       socket.current.on("msg-receive",(msg)=>
       {
-        setArrivalMessage({fromSelf: false, messages:msg})
+        setArrivalMessage({fromSelf: false, message:msg})
       })
     }
   })
 
   useEffect(() => {
-    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
-  }, [arrivalMessage]);
+
+    if (arrivalMessage)
+      setMessages((prev) => [...prev, arrivalMessage]);
+      console.log(arrivalMessage)
+  } , [arrivalMessage]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
