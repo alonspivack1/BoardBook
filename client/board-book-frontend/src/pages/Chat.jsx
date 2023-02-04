@@ -4,7 +4,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { allUsersRoute ,host} from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
-import Welcome from "../components/Welcome";
 import {io} from "socket.io-client"
 import ChatContainer from "../components/ChatContainer";
 
@@ -39,6 +38,7 @@ import ChatContainer from "../components/ChatContainer";
       if (currentUser){
           const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
           setContacts(data.data)
+          setCurrentChat("")
       }}
     fetchData();
   }, [currentUser]); 
@@ -53,11 +53,8 @@ import ChatContainer from "../components/ChatContainer";
       <ChatContainerStyle>
       <div className="container">
           <Contacts contacts={contacts} changeChat={handleChatChange} />
-          {currentChat === undefined ? (
-            <Welcome />
-          ) : (
             <ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket} />
-          )}
+          
         </div>
       </ChatContainerStyle>
     </>

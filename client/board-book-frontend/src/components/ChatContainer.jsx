@@ -5,6 +5,7 @@ import Logout from "./Logout";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute} from "../utils/APIRoutes";
+import Welcome from "./Welcome";
 
 
 export default function ChatContainer({ currentUser,currentChat,socket}) {
@@ -95,6 +96,9 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
   }, [messages]);
 
   return (
+    currentChat&&currentChat!==""?
+    <>
+    {console.log(currentChat)}
     <ChatContainerContainerStyle>
       <div className="chat-header">
         <div className="user-details">
@@ -129,6 +133,8 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
       </div>
       <ChatInput handleSendMsg={handleSendMsg} />
     </ChatContainerContainerStyle>
+    </>:<Welcome/>
+    
   );
 }
 

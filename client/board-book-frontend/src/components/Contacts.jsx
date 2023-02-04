@@ -14,7 +14,7 @@ import Logo from "../assets/logo.svg";
           );
           setCurrentUserName(data.username);
           setCurrentUserImage(data.avatarImage);
-    }
+        }
     fetchData();
   }, []); 
    const changeCurrentChat = (index, contact) => {
