@@ -44,18 +44,31 @@ const io = socket(server,
     });
     global.onlineUsers = new Map();
     io.on("connection",(socket)=>{
-        
+
         socket.on("add-user",(userId)=>
         {
-            onlineUsers.set(userId,socket.id);
+            onlineUsers[userId] = socket.id;
+            console.log(onlineUsers)
         });
         socket.on("send-msg",(data)=>
         {
-            const sendUserSocket = onlineUsers.get(data.to)
+            const sendUserSocket = onlineUsers[data.to]
             if(sendUserSocket)
             {
                 socket.to(sendUserSocket).emit("msg-receive",data)
             }
-        }
-        )
+            else
+            {console.log("Message sended to unconnected user")  }
+        });
+        socket.on('disconnect', function(){
+            console.log('user ' + socket.id + ' disconnected');
+            Object.keys(onlineUsers).forEach(key => {
+                if (onlineUsers[key] === socket.id) {
+                  delete onlineUsers[key];
+                }
+              });
+              console.log(onlineUsers)
+              
+          });
+
     })
