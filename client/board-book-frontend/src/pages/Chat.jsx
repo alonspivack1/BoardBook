@@ -2,17 +2,18 @@ import React, { useEffect, useState,useRef } from "react";
 import { ChatContainerStyle } from "../styles/StyledComponents";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { allUsersRoute ,host} from "../utils/APIRoutes";
+import { allUsersRoute ,host,createRoomRoute} from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
 import {io} from "socket.io-client"
 import ChatContainer from "../components/ChatContainer";
 
  export default function Chat() {
-   const socket = useRef();
+   const socket = useRef(null)
    const navigate = useNavigate();
    const [contacts, setContacts] = useState([]);
    const [currentUser, setCurrentUser] = useState(undefined);
    const [currentChat, setCurrentChat] = useState(undefined);
+   const messageSentStatus = useRef(false);
 
    useEffect(() => {
     async function fetchData() {
@@ -25,13 +26,16 @@ import ChatContainer from "../components/ChatContainer";
             }}
     fetchData();
   }, []); 
-  useEffect(()=>{
+
+  useEffect(() => {
     if(currentUser)
     {
-      socket.current=io(host)
+      socket.current =  io(host);
+      global.socket = socket.current
+      console.log("GS",global.socket)
       socket.current.emit("add-user",currentUser._id)
     }
-  })
+  });
 
   useEffect(() => {
     async function fetchData() {
@@ -46,7 +50,32 @@ import ChatContainer from "../components/ChatContainer";
   
   const handleChatChange = (chat)=>{
     setCurrentChat(chat)
+
   }
+  
+  const handleCreateRoom = async () => {
+    if(currentChat!=="")
+    {
+      await axios.post(createRoomRoute, {
+        users: [currentUser._id,currentChat._id]
+      }
+      ).then((response) => {
+        messageSentStatus.current = response.data.sentSuccessfully
+        if(messageSentStatus.current)
+          {
+            window.open(`/gameroom/${response.data.roomId}`)
+  
+          }
+      }).catch((error)=>alert("1"))
+      if (messageSentStatus.current)
+      {
+      }
+      else{
+        alert("2")
+      }
+    };
+    }
+ 
 
   return (
     <>
@@ -54,7 +83,8 @@ import ChatContainer from "../components/ChatContainer";
       <div className="container">
           <Contacts contacts={contacts} changeChat={handleChatChange} />
             <ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket} />
-          
+            <button onClick={handleCreateRoom}>Game</button>
+
         </div>
       </ChatContainerStyle>
     </>

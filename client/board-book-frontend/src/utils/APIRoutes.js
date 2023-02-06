@@ -5,3 +5,8 @@ export const allUsersRoute = `${host}/api/auth/allusers`
 export const logoutRoute = `${host}/api/auth/logout`;
 export const sendMessageRoute = `${host}/api/messages/addmsg`
 export const recieveMessageRoute = `${host}/api/messages/getmsg`
+export const createRoomRoute = `${host}/api/game/addgameroom`
+export const updateGameRoute = `${host}/api/game/updategame`
+export const getRoomRoute = `${host}/api/game/gameroom`
+
+

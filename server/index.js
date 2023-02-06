@@ -6,6 +6,7 @@ const socket = require("socket.io")
 //userRoutes.js
 const userRoutes = require("./routes/userRoutes")
 const messageRoutes = require("./routes/messageRoutes")
+const gameRoutes = require("./routes/gameRoutes")
 
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json());
 // ! what is /api/auth?
 app.use("/api/auth",userRoutes)
 app.use("/api/messages",messageRoutes)
+app.use("/api/game",gameRoutes)
 
 
 
@@ -43,6 +45,7 @@ const io = socket(server,
         },
     });
     global.onlineUsers = new Map();
+    
     io.on("connection",(socket)=>{
 
         socket.on("add-user",(userId)=>
@@ -57,18 +60,25 @@ const io = socket(server,
             {
                 socket.to(sendUserSocket).emit("msg-receive",data)
             }
-            else
-            {console.log("Message sended to unconnected user")  }
+            else  {console.log("Message sended to unconnected user")  }
         });
-        socket.on('disconnect', function(){
-            console.log('user ' + socket.id + ' disconnected');
+        socket.on("set-board",(data)=>
+        {
+                const sendUserSocket = onlineUsers[data.to]
+                console.log("BU =>", data)
+                console.log("BU2 =>", socket.id)
+                socket.emit("get-board",data.board)
+                socket.broadcast.emit("get-board",data.board)
+                //socket.to(sendUserSocket).emit("get-board",data.board)
+        });
+           socket.on('disconnect', function(){
             Object.keys(onlineUsers).forEach(key => {
                 if (onlineUsers[key] === socket.id) {
+                 console.log('user ' + key + ' disconnected');
                   delete onlineUsers[key];
                 }
               });
               console.log(onlineUsers)
-              
           });
 
     })

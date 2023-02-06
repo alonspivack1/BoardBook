@@ -74,6 +74,7 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
   useEffect(()=>{
     if(socket.current)
     {
+      console.log("Socket1",socket.current)
       socket.current.on("msg-receive",(msg)=>
       {
         if(msg.from===currentChat._id)
@@ -81,9 +82,7 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
          else{
           alert(msg.from+" sent message for you!")
          }
-      })
-    }
-  })
+      })}})
 
   useEffect(() => {
 
