@@ -1,14 +1,16 @@
-import React, { useEffect, useState,useRef } from "react";
+import React, { useEffect, useState,useRef, useContext } from "react";
 import { ChatContainerStyle } from "../styles/StyledComponents";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { allUsersRoute ,host,createRoomRoute} from "../utils/APIRoutes";
+import { allUsersRoute ,createRoomRoute} from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
-import {io} from "socket.io-client"
 import ChatContainer from "../components/ChatContainer";
+import { SocketContext } from "../services/socket";
 
  export default function Chat() {
-   const socket = useRef(null)
+  
+  const socket = useContext(SocketContext);
+
    const navigate = useNavigate();
    const [contacts, setContacts] = useState([]);
    const [currentUser, setCurrentUser] = useState(undefined);
@@ -30,10 +32,7 @@ import ChatContainer from "../components/ChatContainer";
   useEffect(() => {
     if(currentUser)
     {
-      socket.current =  io(host);
-      global.socket = socket.current
-      console.log("GS",global.socket)
-      socket.current.emit("add-user",currentUser._id)
+      socket.emit("add-user",currentUser._id)
     }
   });
 

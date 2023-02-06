@@ -1,14 +1,15 @@
-import React, {useEffect,useState,useRef} from 'react'
+import React, {useEffect,useState,useRef, useContext} from 'react'
 import { useParams } from 'react-router-dom';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getRoomRoute,updateGameRoute,host} from "../utils/APIRoutes";
 import {io} from "socket.io-client"
+import { SocketContext } from '../services/socket';
 
 export default function Game() {
     const enemy = useRef();
     const turn = useRef();
-    const socket = useRef()
+    const socket = useContext(SocketContext);
     const navigate = useNavigate();
     const { roomId } = useParams();
     const player = useRef(false);
@@ -24,23 +25,17 @@ export default function Game() {
 
       if(currentUser)
       {
-        socket.current = io(host);
-        console.log("Socket1",socket.current)
-        socket.current.emit("add-user",currentUser._id)
-  
-        return () => {
-          socket.current.close()
-        };
+        socket.emit("add-user",currentUser._id)
       }
    
-    },[currentUser]);
+    },[currentUser,socket]);  
     
 
     useEffect(()=>{
-      if(socket.current)
+      if(socket)
       {   
-        console.log("Socket2",socket.current)   
-        socket.current.on("get-board",(board)=>
+        console.log("Socket2",socket)   
+        socket.on("get-board",(board)=>
         {
           let temproom = {...roomData}
           temproom.score = board
@@ -50,8 +45,8 @@ export default function Game() {
 
         const UpdateBoard = ()=>{
           setStop(!stop)
-          console.log("Socket3",socket.current)
-          socket.current.emit("set-board",{
+          console.log("Socket3",socket)
+          socket.emit("set-board",{
           to:enemy._id,
           board:roomData.score+1
         })  

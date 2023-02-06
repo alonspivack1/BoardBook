@@ -16,17 +16,21 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
 
 
   useEffect(() => {
-    async function fetchData() {
-      const data = await JSON.parse(
-        localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)
-      );
-      const response = await axios.post(recieveMessageRoute, {
-        from: data._id,
-        to: currentChat._id,
-      });
-      setMessages(response.data);
+    if (currentChat)
+    {
+      async function fetchData() {
+        const data = await JSON.parse(
+          localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)
+        );
+        const response = await axios.post(recieveMessageRoute, {
+          from: data._id,
+          to: currentChat._id,
+        });
+        setMessages(response.data);
+      }
+      fetchData();
     }
-    fetchData();
+
   }, [currentChat]);
 
   useEffect(() => {
@@ -54,7 +58,7 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
     }).catch((error)=>alert("ERROR: NETWORK ERROR!"))
     if (messageSentStatus.current)
     {
-      socket.current.emit("send-msg",
+      socket.emit("send-msg",
       {
         to:currentChat._id,
         from:currentUser._id,
@@ -72,12 +76,12 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
   };
 
   useEffect(()=>{
-    if(socket.current)
+    if(socket)
     {
-      console.log("Socket1",socket.current)
-      socket.current.on("msg-receive",(msg)=>
+      socket.off("msg-receive")
+      socket.on("msg-receive",(msg)=>
       {
-        if(msg.from===currentChat._id)
+        if(currentChat!==""&&msg.from===currentChat._id)
          setArrivalMessage({fromSelf: false, message:msg.message})
          else{
           alert(msg.from+" sent message for you!")
@@ -97,7 +101,6 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
   return (
     currentChat&&currentChat!==""?
     <>
-    {console.log(currentChat)}
     <ChatContainerContainerStyle>
       <div className="chat-header">
         <div className="user-details">
