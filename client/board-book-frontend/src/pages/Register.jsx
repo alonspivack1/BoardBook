@@ -93,7 +93,7 @@ export default function Register() {
         <form action="" onSubmit={(event) => handleSubmit(event)}>
           <div className="brand">
             <img src={Logo} alt="logo" />
-            <h1>Board Book</h1>
+            <h1>{process.env.REACT_APP_NAME}</h1>
           </div>
           <input
             type="text"

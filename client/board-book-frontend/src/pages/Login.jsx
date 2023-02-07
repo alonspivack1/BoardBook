@@ -13,7 +13,6 @@ import { loginRoute } from '../utils/APIRoutes';
 export default function Login() {
 
     const navigate = useNavigate();
-
     const [values,setValues] = useState({
         username:"",
         password:"",
@@ -75,7 +74,7 @@ export default function Login() {
         <form action="" onSubmit={(event) => handleSubmit(event)}>
           <div className="brand">
             <img src={Logo} alt="logo" />
-            <h1>Board Book</h1>
+            <h1>{process.env.REACT_APP_NAME}</h1>
           </div>
           <input
             type="text"

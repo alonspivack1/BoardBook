@@ -166,6 +166,7 @@ overflow: hidden;
 }
 .chat-header {
   display: flex;
+  background-color: #080420;
   justify-content: space-between;
   align-items: center;
   padding: 0 2rem;
@@ -288,14 +289,14 @@ padding: 0 2rem;
 `;
 const ContactsContainerStyle = styled.div`
 display: grid;
-grid-template-rows: 10% 75% 15%;
+grid-template-rows: 11% 79% 11%;
 overflow: hidden;
 background-color: #080420;
 .brand {
   display: flex;
-  align-items: center;
-  gap: 1rem;
   justify-content: center;
+  align-items: center;
+  gap: 1.8rem;
   img {
     height: 2rem;
   }
@@ -371,6 +372,22 @@ background-color: #080420;
   }
 }
 `;
+const GameOfferButtonStyle = styled.button`
+display: flex;
+margin: -10px -5px 0px 0px ;
+justify-content: center;
+align-items: center;
+padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+border-radius: 0.6rem;
+background-color: #9a86f3;
+border: 1px solid;
+cursor: pointer;
+svg {
+  font-size: 1.3rem;
+  color: #ebe7ff;
+}
+`;
+
 const LogoutButtonStyle = styled.button`
 display: flex;
 justify-content: center;
@@ -401,4 +418,4 @@ span {
 
 export { ChatContainerStyle,LoginFormContainerStyle,RegisterFormContainerStyle,
     ChatContainerContainerStyle,ChatInputContainerStyle,ContactsContainerStyle,
-    LogoutButtonStyle,WelcomeContainerStyle};
+    LogoutButtonStyle,WelcomeContainerStyle,GameOfferButtonStyle};

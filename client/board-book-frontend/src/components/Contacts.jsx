@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ContactsContainerStyle } from "../styles/StyledComponents";
 import Logo from "../assets/logo.svg";
+import Logout from "./Logout";
 
  export default function Contacts({ contacts, changeChat }) {
    const [currentUserName, setCurrentUserName] = useState(undefined);
@@ -25,8 +26,10 @@ import Logo from "../assets/logo.svg";
     <>
     <ContactsContainerStyle>
     <div className="brand">
+            <Logout/>
+            <h3>{process.env.REACT_APP_NAME}</h3>
             <img src={Logo} alt="logo" />
-            <h3>Board Book</h3>
+
           </div>
           <div className="contacts">
             {contacts.map((contact, index) => {

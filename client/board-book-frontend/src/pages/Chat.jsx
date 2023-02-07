@@ -10,11 +10,12 @@ import { SocketContext } from "../services/socket";
  export default function Chat() {
   
   const socket = useContext(SocketContext);
-
    const navigate = useNavigate();
    const [contacts, setContacts] = useState([]);
    const [currentUser, setCurrentUser] = useState(undefined);
    const [currentChat, setCurrentChat] = useState(undefined);
+
+
    const messageSentStatus = useRef(false);
 
    useEffect(() => {
@@ -51,28 +52,31 @@ import { SocketContext } from "../services/socket";
     setCurrentChat(chat)
 
   }
-  
+ 
   const handleCreateRoom = async () => {
-    if(currentChat!=="")
-    {
-      await axios.post(createRoomRoute, {
-        users: [currentUser._id,currentChat._id]
-      }
-      ).then((response) => {
-        messageSentStatus.current = response.data.sentSuccessfully
-        if(messageSentStatus.current)
-          {
-            window.open(`/gameroom/${response.data.roomId}`)
+
   
-          }
-      }).catch((error)=>alert("1"))
-      if (messageSentStatus.current)
-      {
-      }
-      else{
-        alert("2")
-      }
-    };
+
+    // if(currentChat!=="")
+    // {
+    //   await axios.post(createRoomRoute, {
+    //     users: [currentUser._id,currentChat._id]
+    //   }
+    //   ).then((response) => {
+    //     messageSentStatus.current = response.data.sentSuccessfully
+    //     if(messageSentStatus.current)
+    //       {
+    //         window.open(`/gameroom/${response.data.roomId}`)
+  
+    //       }
+    //   }).catch((error)=>alert("1"))
+    //   if (messageSentStatus.current)
+    //   {
+    //   }
+    //   else{
+    //     alert("2")
+    //   }
+    // };
     }
  
 
@@ -82,7 +86,6 @@ import { SocketContext } from "../services/socket";
       <div className="container">
           <Contacts contacts={contacts} changeChat={handleChatChange} />
             <ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket} />
-            <button onClick={handleCreateRoom}>Game</button>
 
         </div>
       </ChatContainerStyle>

@@ -6,6 +6,9 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute} from "../utils/APIRoutes";
 import Welcome from "./Welcome";
+import GameOffer from "./GameOfferDialog";
+import GameOfferDialog from "./GameOfferDialog";
+import GameOfferButton from "./GameOfferButton";
 
 
 export default function ChatContainer({ currentUser,currentChat,socket}) {
@@ -13,6 +16,7 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const messageSentStatus = useRef(false);
+  const [gameOffer, setGameOffer] = useState(false);
 
 
   useEffect(() => {
@@ -98,10 +102,27 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const BTN =()=>{
+  setGameOffer(true)
+  }
+
+  const handleGameOffer = (bool) => {
+    setGameOffer(bool)
+  };
+  
   return (
     currentChat&&currentChat!==""?
     <>
-    <ChatContainerContainerStyle>
+    {gameOffer===true?
+    (
+        <>
+              <GameOfferDialog gameOffer={gameOffer} handleGameOffer={handleGameOffer}/> 
+        </>
+        )
+    :
+    (
+      
+      <ChatContainerContainerStyle>
       <div className="chat-header">
         <div className="user-details">
           <div className="avatar">
@@ -114,7 +135,8 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
             <h3>{currentChat.username}</h3>
           </div>
         </div>
-        <Logout />
+        <GameOfferButton handleGameOffer={handleGameOffer}/>
+
       </div>
       <div className="chat-messages">
         {messages.map((message) => {
@@ -135,6 +157,8 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
       </div>
       <ChatInput handleSendMsg={handleSendMsg} />
     </ChatContainerContainerStyle>
+    )}
+  
     </>:<Welcome/>
     
   );
