@@ -55,7 +55,6 @@ const io = socket(server,
         });
         socket.on("send-msg",(data)=>
         {
-            console.log("DATA", data)
             const sendUserSocket = onlineUsers[data.to]
             if(sendUserSocket)
             {
@@ -66,10 +65,9 @@ const io = socket(server,
         socket.on("set-board",(data)=>
         {
                 const sendUserSocket = onlineUsers[data.to]
-                console.log("BU =>", data)
-                console.log("BU2 =>", socket.id)
-                socket.emit("get-board",data.board)
+                //socket.emit("get-board",data.board)
                 //socket.broadcast.emit("get-board",data.board)
+                socket.emit("get-board",data.board)
                 socket.to(sendUserSocket).emit("get-board",data.board)
         });
            socket.on('disconnect', function(){
@@ -79,7 +77,6 @@ const io = socket(server,
                   delete onlineUsers[key];
                 }
               });
-              console.log(onlineUsers)
           });
 
     })

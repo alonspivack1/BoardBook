@@ -3,12 +3,11 @@ import { useParams } from 'react-router-dom';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getRoomRoute,updateGameRoute,host} from "../utils/APIRoutes";
-import {io} from "socket.io-client"
 import { SocketContext } from '../services/socket';
 
 export default function Game() {
     const enemy = useRef();
-    const turn = useRef();
+    const moveTurnTo = useRef()
     const socket = useContext(SocketContext);
     const navigate = useNavigate();
     const { roomId } = useParams();
@@ -17,7 +16,6 @@ export default function Game() {
     const [roomData,setRoomData] = useState(undefined)
     const [currentUser,setCurrentUser] = useState(undefined)
     const [response,setResponse] = useState(undefined)
-    const [stop,setStop] = useState(undefined)
 
 
  
@@ -32,25 +30,18 @@ export default function Game() {
     
 
     useEffect(()=>{
-      if(socket)
+      if(socket&&roomData)
       {   
-        console.log("Socket2",socket)   
+        //! move the socket.on to one time useEffect?
+        socket.off("get-board");
         socket.on("get-board",(board)=>
         {
           let temproom = {...roomData}
           temproom.score = board
+          temproom.turn = !roomData.turn
           setRoomData(temproom)
-          console.log("GET IN!")
         })}}) 
 
-        const UpdateBoard = ()=>{
-          setStop(!stop)
-          console.log("Socket3",socket)
-          socket.emit("set-board",{
-          to:enemy._id,
-          board:roomData.score+1
-        })  
-      }
 
     useEffect(() => {
       async function getGameRoom(roomId) {
@@ -67,95 +58,81 @@ export default function Game() {
       }
       getGameRoom(roomId);
     }, []);
-
-    function a ()
+    useEffect(()=>
     {
-      
-        setStop(true)
-        console.log("2")
-        if (currentUser&&response) {
-          console.log("2")
-          console.log("response -> ", response.data.room);
-          console.log("CU -> ", currentUser);
-          console.log("RD!!!!!!! -> ", roomData);
-  
-          if (currentUser && roomData&&(currentUser._id === roomData.users[0] || currentUser._id === roomData.users[1])
-          ) {
-            player.current=true
-            turn.current = !roomData.turn
-            
-            if (roomData.users[0] === currentUser._id)
-            {
-              enemy.current=roomData.users[1]
-              if (roomData.turn===true)
-              {
-                yourTurn.current=true
-              }
-              else{
-                yourTurn.current=false
-
-              }
-
-            }
-            else if (roomData.users[1]=== currentUser._id)
-            {
-              enemy.current=roomData.users[0]
-              if (roomData.turn===false)
-              {
-                yourTurn.current=true
-              }
-              else
-              {
-                yourTurn.current=false
-
-              }
-            }
-            if (roomData.turn === currentUser._id) {
-            }
-            console.log("player -> ", player.current);
-            console.log("your turn?  -> ", yourTurn.current);
-            console.log("currectUser -> ", currentUser._id);
-          }
-        }    
-      return("a update   ")
-    }
-
-      function e()
+      if(response)
       {
         setRoomData(response.data.room)
-        console.log("CU!=> ",currentUser)
-        console.log("RES!=> ",response)
-        console.log("RD=>",roomData)
-      }
+      }    
+    },[response])
+    useEffect(()=>{
+      if (currentUser&&response&&roomData) {
+
+        if(currentUser._id === roomData.users[0])
+        {
+          player.current=true
+          moveTurnTo.current = false
+          enemy.current=roomData.users[1]
+          if (roomData.turn===true)
+          {
+            yourTurn.current=true
+          }
+          else
+          {
+            yourTurn.current=false
+          }
+        }
+        else if (roomData.users[1] === currentUser._id)
+        {
+          player.current=true
+          moveTurnTo.current = true
+          enemy.current=roomData.users[0]
+          if (roomData.turn===false)
+          {
+            yourTurn.current=true
+          }
+          else
+          {
+            yourTurn.current=false
+          }
+        }
+
+        console.log("Yourturn", yourTurn.current)
+   
+      } 
+    },[roomData])
+
+ 
+
       const ClickHandler = async ()=>{
-        // if(player.current===true&&yourTurn.current===true)
-        // {
+         if(player.current===true&&yourTurn.current===true)
+         {
           await axios.post(updateGameRoute, {
             roomId: roomId,
             score: 1,
-            turn:turn.current
+            turn:moveTurnTo.current
           }
           ).then((ex)=>{
             if(ex.data.updateSuccessful)
               {UpdateBoard()}
            })
-        // }
-   
+         }
       }
 
- 
+        const UpdateBoard = ()=>{
+          socket.emit("set-board",{
+          to:enemy.current,
+          board:roomData.score+1
+        })  
+      }
+
       return (
-                       //! need to change conditions to better clean code!!
         <>
-        <div>
-          Game {roomId}
-          {currentUser!==undefined&&response!==undefined&&roomData===undefined?e():""}
-          {currentUser&&response&&roomData&&!stop?a():""}
-        </div>
+          <h1>Game {roomId}</h1> 
+
         {
           roomData?<button onClick={ClickHandler}>CLickMe {roomData.score}</button>:""
         }
-        <button onClick={UpdateBoard}>UPDATED!!!</button>
         </>
  
         

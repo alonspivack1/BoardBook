@@ -55,7 +55,7 @@ import Logo from "../assets/logo.svg";
             <div className="avatar">
               
               <img
-                      src={`data:image/svg+xml;base64,${currentUserImage}`}
+                      src={currentUserImage?`data:image/svg+xml;base64,${currentUserImage}`:""}
                       alt="avatar"
               />
             </div>
