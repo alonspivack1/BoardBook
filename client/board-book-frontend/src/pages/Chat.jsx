@@ -14,6 +14,7 @@ import { SocketContext } from "../services/socket";
    const [contacts, setContacts] = useState([]);
    const [currentUser, setCurrentUser] = useState(undefined);
    const [currentChat, setCurrentChat] = useState(undefined);
+   const [gameOffer, setGameOffer] = useState(false);
 
 
    const messageSentStatus = useRef(false);
@@ -40,7 +41,7 @@ import { SocketContext } from "../services/socket";
   useEffect(() => {
     async function fetchData() {
       if (currentUser){
-          const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
+          const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);   
           setContacts(data.data)
           setCurrentChat("")
       }}
@@ -50,9 +51,10 @@ import { SocketContext } from "../services/socket";
   
   const handleChatChange = (chat)=>{
     setCurrentChat(chat)
-
   }
- 
+  const handleGameOffer = (bool) => {
+    setGameOffer(bool)
+  };
   const handleCreateRoom = async () => {
 
   
@@ -84,8 +86,8 @@ import { SocketContext } from "../services/socket";
     <>
       <ChatContainerStyle>
       <div className="container">
-          <Contacts contacts={contacts} changeChat={handleChatChange} />
-            <ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket} />
+          <Contacts gameOffer={gameOffer} contacts={contacts} changeChat={handleChatChange} />
+            <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} currentChat={currentChat} currentUser={currentUser} socket={socket} />
 
         </div>
       </ChatContainerStyle>

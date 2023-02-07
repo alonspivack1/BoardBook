@@ -1,22 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChatContainerContainerStyle } from "../styles/StyledComponents";
 import ChatInput from "./ChatInput";
-import Logout from "./Logout";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute} from "../utils/APIRoutes";
 import Welcome from "./Welcome";
-import GameOffer from "./GameOfferDialog";
 import GameOfferDialog from "./GameOfferDialog";
 import GameOfferButton from "./GameOfferButton";
 
 
-export default function ChatContainer({ currentUser,currentChat,socket}) {
+export default function ChatContainer({ currentUser,currentChat,socket,gameOffer,handleGameOffer}) {
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const messageSentStatus = useRef(false);
-  const [gameOffer, setGameOffer] = useState(false);
 
 
   useEffect(() => {
@@ -102,13 +99,9 @@ export default function ChatContainer({ currentUser,currentChat,socket}) {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const BTN =()=>{
-  setGameOffer(true)
-  }
 
-  const handleGameOffer = (bool) => {
-    setGameOffer(bool)
-  };
+
+
   
   return (
     currentChat&&currentChat!==""?

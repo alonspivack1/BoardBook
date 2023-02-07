@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: `${base64DefultAvatar}`,
   },
+  contacts:
+  {
+    type:Array,
+    default:[],
+  }
 });
 
 module.exports = mongoose.model("Users", userSchema);

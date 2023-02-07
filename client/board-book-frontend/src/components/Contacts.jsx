@@ -3,7 +3,7 @@ import { ContactsContainerStyle } from "../styles/StyledComponents";
 import Logo from "../assets/logo.svg";
 import Logout from "./Logout";
 
- export default function Contacts({ contacts, changeChat }) {
+ export default function Contacts({ contacts, changeChat, gameOffer}) {
    const [currentUserName, setCurrentUserName] = useState(undefined);
    const [currentUserImage, setCurrentUserImage] = useState(undefined);
    const [currentSelected, setCurrentSelected] = useState(undefined);
@@ -19,8 +19,12 @@ import Logout from "./Logout";
     fetchData();
   }, []); 
    const changeCurrentChat = (index, contact) => {
-     setCurrentSelected(index);
-     changeChat(contact);
+    if(gameOffer===false)
+    {
+      setCurrentSelected(index);
+      changeChat(contact);
+    }
+
    };
    return(
     <>
@@ -33,6 +37,7 @@ import Logout from "./Logout";
           </div>
           <div className="contacts">
             {contacts.map((contact, index) => {
+              console.log(contacts)
               return (
                 <div
                   key={contact._id}
@@ -50,6 +55,7 @@ import Logout from "./Logout";
                   <div className="username">
                     <h3>{contact.username}</h3>
                   </div>
+                  <div> {contact.Notification?"New":""}</div>
                 </div>
               );
             })}

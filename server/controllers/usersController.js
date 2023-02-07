@@ -1,8 +1,9 @@
 //userModel.js
+const mongoose = require('mongoose');
 const User = require("../model/userModel")
 const bcrypt = require("bcrypt");
+const ObjectId = mongoose.Types.ObjectId;
 
-//#region register
 //module. is mean export just 1 function
 module.exports.register = async (req,res,next) =>{
   try
@@ -28,10 +29,8 @@ module.exports.register = async (req,res,next) =>{
     next(ex);
   }
     };
-  //#endregion register
  
  
- //#region Login
 module.exports.login = async (req,res,next) =>{
 try
 {
@@ -51,11 +50,10 @@ try
   next(ex);
 }
   };
-//#endregion login
 
-//#region getAllUsers
 module.exports.getAllUsers = async (req,res,next) =>{
 
+  
   try{
     //! find? ne? HELP
     const users = await User.find({_id:{$ne:req.params.id}}).select([
@@ -65,9 +63,49 @@ module.exports.getAllUsers = async (req,res,next) =>{
 
   }
   catch(ex){}
-
-
+}
+  
+ module.exports.getAllContacts = async(req,res,next) =>
+ {
+  try {
+    const contacts = await User.find({_id:{$eq:req.params.id}}).select(["contacts"]);
+    const contactsFirstDict = (contacts[0].contacts[0])
+    const contactsList=[]
+    for (const key in contactsFirstDict) {
+      console.log(`key: ${key}, value: ${contactsFirstDict[key]}`);
+      let tempContact = await GetContactData(key,contactsFirstDict[key])
+      contactsList.push(tempContact);
+      
+    }
+    return res.json(contactsList);
+  } catch (ex) {
+    return res.status(500).json({
+      success: false,
+      error: "Server Error"
+    });
+  }
 };
+const GetContactData = async (id,bool)=>
+{
+ 
+  let ID =id.slice(1,-1)
+  const objectId = new ObjectId(ID);
+  let contact = await User.find({_id:{$eq:objectId}}).select([
+    "email","username","avatarImage","_id",
+  ])
+  let newContact =
+  {
+    _id:contact[0]._id,
+    username:contact[0].username,
+    email:contact[0].email,
+    avatarImage:contact[0].avatarImage,
+    Notification:bool,
+  } 
+  return newContact
+}
+ 
+
+
 module.exports.logOut = (req, res, next) => {
   try {
     if (!req.params.id) return res.json({ msg: "User id is required " });
@@ -76,4 +114,3 @@ module.exports.logOut = (req, res, next) => {
     next(ex);
   }
 };
-//#endregion getAllUsers
