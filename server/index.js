@@ -37,6 +37,7 @@ mongoose.connect(process.env.MONGO_URL,{
 const server = app.listen(process.env.PORT,()=>{
     console.log(`Server Started on Port ${process.env.PORT}`)
 });
+
 const io = socket(server,
     {
         cors:{
@@ -44,6 +45,12 @@ const io = socket(server,
             credentials: true,
         },
     });
+
+   // Change the ping interval to 30 seconds
+   io.pingInterval = process.env.PING_INTERVAL;
+   // Change the ping timeout to 10 seconds
+   io.pingTimeout = process.env.PING_TIMEOUT;
+
     global.onlineUsers = new Map();
     
     io.on("connection",(socket)=>{

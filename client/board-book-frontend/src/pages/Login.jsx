@@ -28,7 +28,7 @@ export default function Login() {
 
 
         useEffect(() => {
-          if (localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)) {
+          if (localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)) {
           navigate("/");
           }}, [] );
 
@@ -46,7 +46,7 @@ export default function Login() {
             }
             if (data.status===true)
             {
-                localStorage.setItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME,JSON.stringify(data.user))
+                localStorage.setItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN,JSON.stringify(data.token))
                 navigate("/");
             }
         }

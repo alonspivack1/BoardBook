@@ -6,6 +6,7 @@ import Logo from "../assets/logo.svg";
 import {ToastContainer,toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"
 import axios from "axios";
+import Avatars from '../styles/AvatarsArray';
 
 import { registerRoute } from '../utils/APIRoutes';
 
@@ -14,11 +15,15 @@ export default function Register() {
 
     const navigate = useNavigate();
 
+    const options = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+  
     const [values,setValues] = useState({
         username:"",
         email:"",
         password:"",
         confirmPassword:"",
+        AvatarImage:1
     })
 
     const toastOptions = {
@@ -30,7 +35,7 @@ export default function Register() {
         }
         
         useEffect(() => {
-          if (localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)) {
+          if (localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)) {
           navigate("/");
           }}, [] );
 
@@ -40,16 +45,16 @@ export default function Register() {
         if(handleValidation())
         {
             console.log("in Validation",registerRoute)
-            const { username, email, password} = values;
+            const { username, email, password,AvatarImage} = values;
                 const {data} = await axios.post(registerRoute,
-                    {username,password,email}).catch();
+                    {username,password,email,AvatarImage}).catch();
             if (data.status===false)
             {
                 toast.error(data.msg,toastOptions);
             }
             if (data.status===true)
             {
-                localStorage.setItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME,JSON.stringify(data.user))
+                localStorage.setItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN,JSON.stringify(data.token))
                 navigate("/");
             }
         }
@@ -95,6 +100,18 @@ export default function Register() {
             <img src={Logo} alt="logo" />
             <h1>{process.env.REACT_APP_NAME}</h1>
           </div>
+          <div style={{ display: 'flex', textAlign: 'center', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+      <select name="AvatarImage" value={values.AvatarImage} onChange={e =>handleChange(e)}>
+        {options.map(option => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      <br />
+      <br />
+      <img src={Avatars[values.AvatarImage-1]} width = "100" height="100" alt="Selected Option" />
+    </div>
           <input
             type="text"
             placeholder="Username"

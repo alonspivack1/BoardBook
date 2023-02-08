@@ -8,10 +8,9 @@ import { logoutRoute } from "../utils/APIRoutes";
 export default function Logout() {
   const navigate = useNavigate();
   const handleClick = async () => {
-    const id = await JSON.parse(
-      localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)
-    )._id;
-    const data = await axios.get(`${logoutRoute}/${id}`);
+    const token = await JSON.parse(
+      localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN));
+    const data = await axios.get(`${logoutRoute}/${token}`);
     if (data.status === 200) {
       localStorage.clear();
       navigate("/login");

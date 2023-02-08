@@ -2,7 +2,7 @@ import React, {useEffect,useState,useRef, useContext} from 'react'
 import { useParams } from 'react-router-dom';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getRoomRoute,updateGameRoute,host} from "../utils/APIRoutes";
+import { getRoomRoute,updateGameRoute,getUserByTokenRoute,host} from "../utils/APIRoutes";
 import { SocketContext } from '../services/socket';
 
 export default function Game() {
@@ -46,11 +46,21 @@ export default function Game() {
     useEffect(() => {
       async function getGameRoom(roomId) {
         try {
-          if (!localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)) {
+          if (!localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)) {
             navigate("/login");
           } else {
-            setCurrentUser(JSON.parse(localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)));
-            setResponse( await axios.get(`${getRoomRoute}/${roomId}`))
+            const token =await localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)
+            const data = await axios.get(`${getUserByTokenRoute}/${token}`);   
+            if(!data)
+            {
+              localStorage.clear();
+              navigate("/login");
+            }
+            else
+            {
+              setCurrentUser(data.data[0]);
+              setResponse( await axios.get(`${getRoomRoute}/${roomId}`))
+            }           
           }
         } catch (error) {
           console.error(error);

@@ -132,6 +132,22 @@ input {
     outline: none;
   }
 }
+select {
+  display: flex;
+  background-color: transparent;
+  padding: 1rem;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  border: 0.1rem solid #4e0eff;
+  border-radius: 0.4rem;
+  color: white;
+  font-size: 1rem;
+  &:focus {
+    border: 0.1rem solid #997af0;
+    outline: none;
+  }
+}
 button {
   background-color: #4e0eff;
   color: white;

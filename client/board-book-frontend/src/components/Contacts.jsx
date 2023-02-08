@@ -2,22 +2,11 @@ import React, { useState, useEffect } from "react";
 import { ContactsContainerStyle } from "../styles/StyledComponents";
 import Logo from "../assets/logo.svg";
 import Logout from "./Logout";
-
- export default function Contacts({ contacts, changeChat, gameOffer}) {
-   const [currentUserName, setCurrentUserName] = useState(undefined);
-   const [currentUserImage, setCurrentUserImage] = useState(undefined);
+import Avatars from "../styles/AvatarsArray";
+ export default function Contacts({ contacts, currentUserImage,currentUserName,changeChat, gameOffer}) {
    const [currentSelected, setCurrentSelected] = useState(undefined);
 
-   useEffect(() => {
-    async function fetchData() {
-        const data = await JSON.parse(
-            localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)
-          );
-          setCurrentUserName(data.username);
-          setCurrentUserImage(data.avatarImage);
-        }
-    fetchData();
-  }, []); 
+
    const changeCurrentChat = (index, contact) => {
     if(gameOffer===false)
     {
@@ -47,15 +36,17 @@ import Logout from "./Logout";
                   onClick={() => changeCurrentChat(index, contact)}
                 >
                   <div className="avatar">
+                    
                     <img
-                      src={`data:image/svg+xml;base64,${contact.avatarImage}`}
+                      src ={Avatars[contact.avatarImage]}          
                       alt=""
                     />
                   </div>
                   <div className="username">
                     <h3>{contact.username}</h3>
                   </div>
-                  <div> {contact.Notification?"New":""}</div>
+                  {console.log("contact",contact.Notification)}
+                  <div> {(contact.Notification)?"New":""}</div>
                 </div>
               );
             })}
@@ -64,7 +55,7 @@ import Logout from "./Logout";
             <div className="avatar">
               
               <img
-                      src={currentUserImage?`data:image/svg+xml;base64,${currentUserImage}`:""}
+                      src={Avatars[currentUserImage]}
                       alt="avatar"
               />
             </div>

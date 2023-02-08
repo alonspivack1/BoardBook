@@ -2,7 +2,7 @@ import React, { useEffect, useState,useRef, useContext } from "react";
 import { ChatContainerStyle } from "../styles/StyledComponents";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { allUsersRoute ,createRoomRoute} from "../utils/APIRoutes";
+import { getUserByTokenRoute,allContactsRoute ,createRoomRoute} from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
 import ChatContainer from "../components/ChatContainer";
 import { SocketContext } from "../services/socket";
@@ -21,13 +21,23 @@ import { SocketContext } from "../services/socket";
 
    useEffect(() => {
     async function fetchData() {
-      if (!localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)) {
+      if (!localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)) {
         navigate("/login");
       } else {
-        setCurrentUser(
-          await JSON.parse(
-            localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)));
-            }}
+        const token =await localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)
+        const data = await axios.get(`${getUserByTokenRoute}/${token}`);   
+        if(!data)
+        {
+          localStorage.clear();
+          navigate("/login");
+        }
+        else
+        {
+            setCurrentUser(data.data[0]);
+           
+        }
+        }
+        }
     fetchData();
   }, []); 
 
@@ -41,9 +51,10 @@ import { SocketContext } from "../services/socket";
   useEffect(() => {
     async function fetchData() {
       if (currentUser){
-          const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);   
+          const data = await axios.get(`${allContactsRoute}/${currentUser._id}`);   
           setContacts(data.data)
           setCurrentChat("")
+          console.log(data)
       }}
     fetchData();
   }, [currentUser]); 
@@ -84,13 +95,17 @@ import { SocketContext } from "../services/socket";
 
   return (
     <>
-      <ChatContainerStyle>
-      <div className="container">
-          <Contacts gameOffer={gameOffer} contacts={contacts} changeChat={handleChatChange} />
-            <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} currentChat={currentChat} currentUser={currentUser} socket={socket} />
-
-        </div>
-      </ChatContainerStyle>
+      {currentUser?
+      (
+        <ChatContainerStyle>
+        <div className="container">
+            <Contacts currentUserImage={currentUser.avatarImage} currentUserName ={currentUser.username} gameOffer={gameOffer} contacts={contacts} changeChat={handleChatChange} />
+              <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} currentChat={currentChat} currentUser={currentUser} socket={socket} />
+  
+          </div>
+        </ChatContainerStyle>
+      ):""}
+  
     </>
   );
 }

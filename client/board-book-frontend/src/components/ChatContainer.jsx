@@ -7,7 +7,7 @@ import { sendMessageRoute, recieveMessageRoute} from "../utils/APIRoutes";
 import Welcome from "./Welcome";
 import GameOfferDialog from "./GameOfferDialog";
 import GameOfferButton from "./GameOfferButton";
-
+import Avatars from "../styles/AvatarsArray";
 
 export default function ChatContainer({ currentUser,currentChat,socket,gameOffer,handleGameOffer}) {
   const [messages, setMessages] = useState([]);
@@ -20,11 +20,8 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
     if (currentChat)
     {
       async function fetchData() {
-        const data = await JSON.parse(
-          localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)
-        );
         const response = await axios.post(recieveMessageRoute, {
-          from: data._id,
+          from: currentUser._id,
           to: currentChat._id,
         });
         setMessages(response.data);
@@ -32,26 +29,15 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
       fetchData();
     }
 
-  }, [currentChat]);
+  }, [currentChat,currentUser]);
 
-  useEffect(() => {
-    const getCurrentChat = async () => {
-      if (currentChat) {
-        await JSON.parse(
-          localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)
-        )._id;
-      }
-    };
-    getCurrentChat();
-  }, [currentChat]);
+ 
 
   const handleSendMsg = async (msg) => {
-    const data = await JSON.parse(
-      localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_NAME)
-    );
+   
   
     await axios.post(sendMessageRoute, {
-      from: data._id,
+      from: currentUser._id,
       to: currentChat._id,
       message: msg,
     }).then((response) => {
@@ -120,7 +106,7 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
         <div className="user-details">
           <div className="avatar">
             <img
-              src={`data:image/svg+xml;base64,${currentChat.avatarImage}`}
+              src={Avatars[currentChat.avatarImage]}
               alt=""
             />
           </div>
@@ -152,7 +138,7 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
     </ChatContainerContainerStyle>
     )}
   
-    </>:<Welcome/>
+    </>:<Welcome username = {"currentUser.username"}/>
     
   );
 }
