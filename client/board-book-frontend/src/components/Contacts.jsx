@@ -3,6 +3,8 @@ import { ContactsContainerStyle } from "../styles/StyledComponents";
 import Logo from "../assets/logo.svg";
 import Logout from "./Logout";
 import Avatars from "../styles/AvatarsArray";
+import { AiOutlineMessage } from "react-icons/ai";
+
  export default function Contacts({ contacts, currentUserImage,currentUserName,changeChat, gameOffer}) {
    const [currentSelected, setCurrentSelected] = useState(undefined);
 
@@ -26,7 +28,6 @@ import Avatars from "../styles/AvatarsArray";
           </div>
           <div className="contacts">
             {contacts.map((contact, index) => {
-              console.log(contacts)
               return (
                 <div
                   key={contact._id}
@@ -45,8 +46,15 @@ import Avatars from "../styles/AvatarsArray";
                   <div className="username">
                     <h3>{contact.username}</h3>
                   </div>
-                  {console.log("contact",contact.Notification)}
-                  <div> {(contact.Notification)?"New":""}</div>
+                  <div> {(contact.Notification)?
+                  (
+                   <AiOutlineMessage style={{
+                    height: "20px",
+                    width: "20px",
+                    color: "white"
+                  }}/>
+                    
+                  ):""}</div>
                 </div>
               );
             })}

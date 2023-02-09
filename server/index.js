@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors")
 const mongoose = require("mongoose")
 const socket = require("socket.io")
+const User = require("./model/userModel")
 
 //userRoutes.js
 const userRoutes = require("./routes/userRoutes")
@@ -52,12 +53,24 @@ const io = socket(server,
    io.pingTimeout = process.env.PING_TIMEOUT;
 
     global.onlineUsers = new Map();
-    
+    const changeStatus = async (id,status) =>  
+    {
+    try{
+        const user = await User.findById(id);
+        user.status = status;
+        if (status==="offline")
+        {user.currentChat = "";}
+        await user.save();
+
+    }
+    catch(ex){}
+    }
     io.on("connection",(socket)=>{
 
-        socket.on("add-user",(userId)=>
+        socket.on("add-user",(userId,status)=>
         {
             onlineUsers[userId] = socket.id;
+            changeStatus(userId,status)
             console.log(onlineUsers)
         });
         socket.on("send-msg",(data)=>
@@ -72,18 +85,20 @@ const io = socket(server,
         socket.on("set-board",(data)=>
         {
                 const sendUserSocket = onlineUsers[data.to]
-                //socket.emit("get-board",data.board)
-                //socket.broadcast.emit("get-board",data.board)
+                //socket.emit("get-board",data.board) //!to spectate, but the "get-board" need changed to string of GameID
+                //socket.broadcast.emit("get-board",data.board) 
                 socket.emit("get-board",data.board)
                 socket.to(sendUserSocket).emit("get-board",data.board)
         });
            socket.on('disconnect', function(){
             Object.keys(onlineUsers).forEach(key => {
                 if (onlineUsers[key] === socket.id) {
+                 changeStatus(key,"offline")
                  console.log('user ' + key + ' disconnected');
-                  delete onlineUsers[key];
+                 delete onlineUsers[key];
                 }
               });
           });
 
-    })
+    }
+    )

@@ -1,8 +1,8 @@
 import React from "react";
 import { WelcomeContainerStyle } from "../styles/StyledComponents";
 import Robot from "../assets/robot.gif";
-export default function Welcome(username) {
-
+export default function Welcome({username}) {
+  return (
     <WelcomeContainerStyle>
       <img src={Robot} alt="" />
       <h1>
@@ -10,4 +10,7 @@ export default function Welcome(username) {
       </h1>
       <h3>Please select a chat to Start messaging.</h3>
     </WelcomeContainerStyle>
+   )
+
+
 }

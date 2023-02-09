@@ -1,4 +1,5 @@
 const Messages = require("../model/messageModel");
+const User = require("../model/userModel")
 
 module.exports.getMessages = async (req, res, next) => {
   try {
@@ -31,6 +32,14 @@ module.exports.addMessage = async (req, res, next) => {
       users: [from, to],
       sender: from,
     });
+    const user = await User.findById(to);
+    if(user.currentChat!==from)
+    {
+      await User.updateOne({ _id: to }, { $set: { [`contacts.${from}`]: true } });
+    }
+
+    await user.save();
+    
 
     if (data) return res.json({ sentSuccessfully:true});
     else return res.json({ sentSuccessfully: false});

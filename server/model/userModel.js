@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema({
   },
   contacts:
   {
-    type:Array,
-    default:[],
+    type:Object,
+    default:{},
   },
   status:
   {
@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema({
   {
     type:Number,
     default:0
+  },
+  currentChat:
+  {
+    type:String,
+    default:""
   }
 });
 

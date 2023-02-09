@@ -23,7 +23,7 @@ export default function Game() {
 
       if(currentUser)
       {
-        socket.emit("add-user",currentUser._id)
+        socket.emit("add-user",currentUser._id,"ingame")
       }
    
     },[currentUser,socket]);  

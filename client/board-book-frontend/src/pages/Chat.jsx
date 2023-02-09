@@ -2,7 +2,7 @@ import React, { useEffect, useState,useRef, useContext } from "react";
 import { ChatContainerStyle } from "../styles/StyledComponents";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getUserByTokenRoute,allContactsRoute ,createRoomRoute} from "../utils/APIRoutes";
+import { getUserByTokenRoute,allContactsRoute ,createRoomRoute,ChangeChat} from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
 import ChatContainer from "../components/ChatContainer";
 import { SocketContext } from "../services/socket";
@@ -15,7 +15,6 @@ import { SocketContext } from "../services/socket";
    const [currentUser, setCurrentUser] = useState(undefined);
    const [currentChat, setCurrentChat] = useState(undefined);
    const [gameOffer, setGameOffer] = useState(false);
-
 
    const messageSentStatus = useRef(false);
 
@@ -44,7 +43,7 @@ import { SocketContext } from "../services/socket";
   useEffect(() => {
     if(currentUser)
     {
-      socket.emit("add-user",currentUser._id)
+      socket.emit("add-user",currentUser._id,"online")
     }
   });
 
@@ -54,17 +53,26 @@ import { SocketContext } from "../services/socket";
           const data = await axios.get(`${allContactsRoute}/${currentUser._id}`);   
           setContacts(data.data)
           setCurrentChat("")
-          console.log(data)
       }}
     fetchData();
   }, [currentUser]); 
   
   
-  const handleChatChange = (chat)=>{
+  const handleChatChange = async (chat)=>{
+    chat.Notification=false
     setCurrentChat(chat)
-  }
+    await axios.post(ChangeChat, {UserId:currentUser._id, ContactID:chat._id})
+    }
+  
   const handleGameOffer = (bool) => {
     setGameOffer(bool)
+  };
+  const handleContacts = async (id) => {
+    let updatedContacts = [...contacts]
+    const index = updatedContacts.findIndex(user => user._id === id);
+    updatedContacts[index].Notification=true
+    setContacts(updatedContacts)
+
   };
   const handleCreateRoom = async () => {
 
@@ -100,7 +108,7 @@ import { SocketContext } from "../services/socket";
         <ChatContainerStyle>
         <div className="container">
             <Contacts currentUserImage={currentUser.avatarImage} currentUserName ={currentUser.username} gameOffer={gameOffer} contacts={contacts} changeChat={handleChatChange} />
-              <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} currentChat={currentChat} currentUser={currentUser} socket={socket} />
+              <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} handleContacts={handleContacts}currentChat={currentChat} currentUser={currentUser} socket={socket} />
   
           </div>
         </ChatContainerStyle>

@@ -55,9 +55,7 @@ try
 }
   };
 
-module.exports.getAllUsers = async (req,res,next) =>{
-
-  
+module.exports.getAllUsers = async (req,res,next) =>{  
   try{
     //! find? ne? HELP
     const users = await User.find({_id:{$ne:req.params.id}}).select([
@@ -73,14 +71,13 @@ module.exports.getAllUsers = async (req,res,next) =>{
  {
   try {
     const contacts = await User.find({_id:{$eq:req.params.id}}).select(["contacts"]);
-    const contactsFirstDict = (contacts[0].contacts[0])
+    const contactsFirstDict = (contacts[0].contacts)
     const contactsList=[]
     for (const key in contactsFirstDict) {
       console.log(`key: ${key}, value: ${contactsFirstDict[key]}`);
 
       let tempContact = await GetContactData(key,contactsFirstDict[key])
       contactsList.push(tempContact);
-      console.log("contactsList",contactsList)
     }
     return res.json(contactsList);
   } catch (ex) {
@@ -92,21 +89,16 @@ module.exports.getAllUsers = async (req,res,next) =>{
 };
 const GetContactData = async (id,bool)=>
 {
-  console.log("1","1")
 
   try{
-      console.log("2","2")
 
   let ID =id
-  console.log("3","3")
 
   const objectId = new ObjectId(ID);
-  console.log("4","4")
 
   let contact = await User.find({_id:{$eq:objectId}}).select([
     "username","avatarImage","_id",
   ])
-  console.log("5","5")
 
   let newContact =
   {
@@ -115,7 +107,6 @@ const GetContactData = async (id,bool)=>
     avatarImage:contact[0].avatarImage,
     Notification:bool,
   } 
-  console.log("newContact",newContact)
   return newContact
 }
 catch(ex){}
@@ -133,11 +124,6 @@ module.exports.logOut = (req, res, next) => {
     next(ex);
   }
 };
-
-module.exports.changeStatus = (req,res,next) =>
-{
-
-}
 
 module.exports.getUserByToken =async (req,res,next)=>
 {
@@ -168,7 +154,18 @@ const verifyUser =(userToken)=>
 catch(ex){}
 }
 
+module.exports.changeChat  = async (req, res, next) => {
+  try {
+    const { UserId, ContactID} = req.body;
+    const user = await User.findById(UserId);
+    await User.updateOne({ _id: UserId }, { $set: { [`contacts.${ContactID}`]: false } });
+    user.currentChat = ContactID;
 
-
+    const updated = await user.save();
+    res.status(200).json({ message: "Notification changed successfully", updated });
+  } catch (error) {
+    res.status(400).json({ message: "Error updating notification", error });
+  }
+  };
 
 

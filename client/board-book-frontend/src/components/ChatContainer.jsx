@@ -9,7 +9,7 @@ import GameOfferDialog from "./GameOfferDialog";
 import GameOfferButton from "./GameOfferButton";
 import Avatars from "../styles/AvatarsArray";
 
-export default function ChatContainer({ currentUser,currentChat,socket,gameOffer,handleGameOffer}) {
+export default function ChatContainer({ currentUser,currentChat,socket,gameOffer,handleGameOffer,handleContacts}) {
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
@@ -40,8 +40,8 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
       from: currentUser._id,
       to: currentChat._id,
       message: msg,
-    }).then((response) => {
-      messageSentStatus.current = response.data.sentSuccessfully
+    }).then(async (response) => {
+        messageSentStatus.current = response.data.sentSuccessfully  
     }).catch((error)=>alert("ERROR: NETWORK ERROR!"))
     if (messageSentStatus.current)
     {
@@ -71,7 +71,7 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
         if(currentChat!==""&&msg.from===currentChat._id)
          setArrivalMessage({fromSelf: false, message:msg.message})
          else{
-          alert(msg.from+" sent message for you!")
+          handleContacts(msg.from)
          }
       })}})
 
@@ -91,54 +91,57 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
   
   return (
     currentChat&&currentChat!==""?
-    <>
-    {gameOffer===true?
     (
-        <>
-              <GameOfferDialog gameOffer={gameOffer} handleGameOffer={handleGameOffer}/> 
-        </>
-        )
-    :
-    (
-      
-      <ChatContainerContainerStyle>
-      <div className="chat-header">
-        <div className="user-details">
-          <div className="avatar">
-            <img
-              src={Avatars[currentChat.avatarImage]}
-              alt=""
-            />
+      <>
+      {gameOffer===true?
+      (
+          <>
+                <GameOfferDialog gameOffer={gameOffer} handleGameOffer={handleGameOffer}/> 
+          </>
+      )
+      :
+      (
+        
+        <ChatContainerContainerStyle>
+        <div className="chat-header">
+          <div className="user-details">
+            <div className="avatar">
+              <img
+                src={Avatars[currentChat.avatarImage]}
+                alt=""
+              />
+            </div>
+            <div className="username">
+              <h3>{currentChat.username}</h3>
+            </div>
           </div>
-          <div className="username">
-            <h3>{currentChat.username}</h3>
-          </div>
+          <GameOfferButton handleGameOffer={handleGameOffer}/>
+  
         </div>
-        <GameOfferButton handleGameOffer={handleGameOffer}/>
-
-      </div>
-      <div className="chat-messages">
-        {messages.map((message) => {
-          return (
-            <div ref={scrollRef} key={uuidv4()}>
-              <div
-                className={`message ${
-                  message.fromSelf ? "sended" : "received"
-                }`}
-              >
-                <div className="content ">
-                  <p>{message.message}</p>
+        <div className="chat-messages">
+          {messages.map((message) => {
+            return (
+              <div ref={scrollRef} key={uuidv4()}>
+                <div
+                  className={`message ${
+                    message.fromSelf ? "sended" : "received"
+                  }`}
+                >
+                  <div className="content ">
+                    <p>{message.message}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-      <ChatInput handleSendMsg={handleSendMsg} />
-    </ChatContainerContainerStyle>
-    )}
-  
-    </>:<Welcome username = {"currentUser.username"}/>
+            );
+          })}
+        </div>
+        <ChatInput handleSendMsg={handleSendMsg} />
+      </ChatContainerContainerStyle>
+      )}
+    
+      </>
+    )
+  :(currentUser?(<Welcome/>):"")
     
   );
 }
