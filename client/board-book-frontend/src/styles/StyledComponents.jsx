@@ -305,7 +305,7 @@ padding: 0 2rem;
 `;
 const ContactsContainerStyle = styled.div`
 display: grid;
-grid-template-rows: 11% 79% 11%;
+grid-template-rows: 7% 4% 79% 11%;
 overflow: hidden;
 background-color: #080420;
 .brand {
@@ -320,6 +320,31 @@ background-color: #080420;
     color: white;
     text-transform: uppercase;
   }
+}
+.fragment {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+    button
+  {
+    width: 5rem;
+    height: 2rem;
+    color:white;
+    border-radius: 1rem;
+    background-color: #ffffff39;
+    opacity:0.4;
+    border:1px solid;
+
+  }
+  .selected{   
+    background-color: #ffffff39;
+    border:0.5px solid;
+    opacity:0.9;
+
+
+  }
+
 }
 .contacts {
   display: flex;

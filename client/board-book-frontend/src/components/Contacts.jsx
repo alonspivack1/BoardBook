@@ -7,6 +7,9 @@ import { AiOutlineMessage } from "react-icons/ai";
 
  export default function Contacts({ contacts, currentUserImage,currentUserName,changeChat, gameOffer}) {
    const [currentSelected, setCurrentSelected] = useState(undefined);
+   const [contactsOnline,setContactsOnline] = useState(true);
+   const [contactsInGame,setContactsInGame] = useState(true);
+   const [contactsOffline,setContactsOffline] = useState(false);
 
 
    const changeCurrentChat = (index, contact) => {
@@ -17,6 +20,36 @@ import { AiOutlineMessage } from "react-icons/ai";
     }
 
    };
+   const DisplayContactDependStatus=(status)=>
+   {
+    if (status!=="")
+    {
+
+      if (status==="online")
+      {
+        if(contactsOnline)
+        {
+          return  true
+        }
+      }
+      else if(status==="offline")
+      {
+        if(contactsOffline)
+        {
+          return  true
+        }
+      }
+      else if(status === "ingame")
+      {
+        if(contactsInGame)
+        {
+          return  true
+        }
+      }
+    }
+
+    return false
+   }
    return(
     <>
     <ContactsContainerStyle>
@@ -24,18 +57,28 @@ import { AiOutlineMessage } from "react-icons/ai";
             <Logout/>
             <h3>{process.env.REACT_APP_NAME}</h3>
             <img src={Logo} alt="logo" />
+          </div>
+          <div className="fragment">
+            <button onClick={()=>setContactsOnline((prev)=>!prev)}
+              className={`${contactsOnline ? "selected" : ""}`}
+              >online</button>
+            <button onClick={()=>setContactsInGame((prev)=>!prev)}
+              className={`${contactsInGame ? "selected" : ""}`}
+              >in-game</button>
+            <button onClick={()=>setContactsOffline((prev)=>!prev)}
+              className={`${contactsOffline ? "selected" : ""}`}
+              >offline</button>
 
           </div>
           <div className="contacts">
-            {contacts.map((contact, index) => {
+            {contacts.filter(contact => DisplayContactDependStatus(contact.status)===true).map((contact, index) => {
+
               return (
-                <div
+                
+                <div 
                   key={contact._id}
-                  className={`contact ${
-                    index === currentSelected ? "selected" : ""
-                  }`}
-                  onClick={() => changeCurrentChat(index, contact)}
-                >
+                  className={`contact ${index === currentSelected ? "selected" : ""}`}
+                  onClick={() => changeCurrentChat(index, contact)} >
                   <div className="avatar">
                     
                     <img
@@ -57,6 +100,7 @@ import { AiOutlineMessage } from "react-icons/ai";
                   ):""}</div>
                 </div>
               );
+
             })}
           </div>
           <div className="current-user">

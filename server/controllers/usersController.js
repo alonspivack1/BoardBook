@@ -97,7 +97,7 @@ const GetContactData = async (id,bool)=>
   const objectId = new ObjectId(ID);
 
   let contact = await User.find({_id:{$eq:objectId}}).select([
-    "username","avatarImage","_id",
+    "username","avatarImage","_id","status"
   ])
 
   let newContact =
@@ -105,6 +105,7 @@ const GetContactData = async (id,bool)=>
     _id:contact[0]._id,
     username:contact[0].username,
     avatarImage:contact[0].avatarImage,
+    status:contact[0].status,
     Notification:bool,
   } 
   return newContact
