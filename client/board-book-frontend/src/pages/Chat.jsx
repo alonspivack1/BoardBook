@@ -43,10 +43,31 @@ import { SocketContext } from "../services/socket";
   useEffect(() => {
     if(currentUser)
     {
-      socket.emit("add-user",currentUser._id,"online")
+      socket.emit("add-user",currentUser._id,process.env.REACT_APP_STATUS_ONLINE)
     }
-  });
+  },[socket,currentUser]);
+  useEffect(()=>
+  {
+    console.log("Update Contacts")
+    //socket.off("contacts-updated")
+    if(contacts)
+    {
+      socket.on("contacts-updated",(data)=>
+      {
+        let tempContacts = [...contacts]
+        for (var i = 0; i < tempContacts.length; i++) {
+          if (tempContacts[i]._id === data.id) {
+            tempContacts[i].status = data.status;
+            break;
+          }
+        }
+        setContacts(tempContacts)
+      })
+      
+    }
+  },[socket,contacts])
 
+  
   useEffect(() => {
     async function fetchData() {
       if (currentUser){

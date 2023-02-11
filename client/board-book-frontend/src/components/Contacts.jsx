@@ -4,13 +4,17 @@ import Logo from "../assets/logo.svg";
 import Logout from "./Logout";
 import Avatars from "../styles/AvatarsArray";
 import { AiOutlineMessage } from "react-icons/ai";
+import axios from "axios";
+import { SearchUsersRoute } from "../utils/APIRoutes";
 
  export default function Contacts({ contacts, currentUserImage,currentUserName,changeChat, gameOffer}) {
    const [currentSelected, setCurrentSelected] = useState(undefined);
    const [contactsOnline,setContactsOnline] = useState(true);
    const [contactsInGame,setContactsInGame] = useState(true);
-   const [contactsOffline,setContactsOffline] = useState(false);
-
+   const [contactsOffline,setContactsOffline] = useState(true);
+   const [Search,setSearch] = useState(true);
+   const [searchValue,setSearchValue] = useState("");
+   const [contactsSearch,setContactsSearch] = useState();
 
    const changeCurrentChat = (index, contact) => {
     if(gameOffer===false)
@@ -25,21 +29,21 @@ import { AiOutlineMessage } from "react-icons/ai";
     if (status!=="")
     {
 
-      if (status==="online")
+      if (status===process.env.REACT_APP_STATUS_ONLINE)
       {
         if(contactsOnline)
         {
           return  true
         }
       }
-      else if(status==="offline")
+      else if(status===process.env.REACT_APP_STATUS_OFFLINE)
       {
         if(contactsOffline)
         {
           return  true
         }
       }
-      else if(status === "ingame")
+      else if(status === process.env.REACT_APP_STATUS_INGAME)
       {
         if(contactsInGame)
         {
@@ -47,9 +51,25 @@ import { AiOutlineMessage } from "react-icons/ai";
         }
       }
     }
-
     return false
    }
+
+
+   const handleSearch = async (value)=>{
+    setSearchValue(value)
+
+    if(value.length>=3)
+    {
+      const data = await axios.get(`${SearchUsersRoute}/${value}/${currentUserName}`);   
+      setContactsSearch(data.data)
+    }
+    else
+    {
+      setContactsSearch()
+
+    }
+   }
+  
    return(
     <>
     <ContactsContainerStyle>
@@ -58,7 +78,54 @@ import { AiOutlineMessage } from "react-icons/ai";
             <h3>{process.env.REACT_APP_NAME}</h3>
             <img src={Logo} alt="logo" />
           </div>
-          <div className="fragment">
+          {Search===true?(
+            <>
+            <div>
+              <input
+                type="text"
+                placeholder="search contact"
+                value={searchValue}
+                onChange={(event) => handleSearch(event.target.value)}/>
+            </div>
+           
+           {contactsSearch?(       
+            <>     
+            {contactsSearch.length===0?
+            (
+              <h3 style={{ color: 'white' }}>No suitable user found</h3>
+            ):""}
+            <div className="contacts">
+            {contactsSearch.map((contact, index) => {
+              return (       
+                <div 
+                  key={contact._id}
+                  className="contact"
+                  onClick={() => changeCurrentChat(index, contact)} >
+                  <div className={`avatar`}>
+                    
+                    <img
+                      src ={Avatars[contact.avatarImage]}          
+                      alt=""
+                    />
+                  </div>
+                  <div className="username">
+                    <h3>{contact.username}</h3>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+            </>
+            ):(<div className="username">
+              <h3 style={{ color: 'white' }}>Search with at least 3 chars and max 20</h3>
+            </div>)}
+          
+            </>
+            ):
+    (
+     <>
+     
+     <div className="fragment">
             <button onClick={()=>setContactsOnline((prev)=>!prev)}
               className={`${contactsOnline ? "selected" : ""}`}
               >online</button>
@@ -79,7 +146,7 @@ import { AiOutlineMessage } from "react-icons/ai";
                   key={contact._id}
                   className={`contact ${index === currentSelected ? "selected" : ""}`}
                   onClick={() => changeCurrentChat(index, contact)} >
-                  <div className="avatar">
+                  <div className={`avatar ${contact.status}`}>
                     
                     <img
                       src ={Avatars[contact.avatarImage]}          
@@ -103,6 +170,9 @@ import { AiOutlineMessage } from "react-icons/ai";
 
             })}
           </div>
+          </> 
+    )
+    }
           <div className="current-user">
             <div className="avatar">
               

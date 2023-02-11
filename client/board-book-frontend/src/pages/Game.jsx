@@ -23,7 +23,7 @@ export default function Game() {
 
       if(currentUser)
       {
-        socket.emit("add-user",currentUser._id,"ingame")
+        socket.emit("add-user",currentUser._id,process.env.REACT_APP_STATUS_INGAME)
       }
    
     },[currentUser,socket]);  

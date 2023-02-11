@@ -74,8 +74,6 @@ module.exports.getAllUsers = async (req,res,next) =>{
     const contactsFirstDict = (contacts[0].contacts)
     const contactsList=[]
     for (const key in contactsFirstDict) {
-      console.log(`key: ${key}, value: ${contactsFirstDict[key]}`);
-
       let tempContact = await GetContactData(key,contactsFirstDict[key])
       contactsList.push(tempContact);
     }
@@ -168,5 +166,48 @@ module.exports.changeChat  = async (req, res, next) => {
     res.status(400).json({ message: "Error updating notification", error });
   }
   };
+  module.exports.changeStatus = async (id,status) =>  
+  {
+  try{
+      const user = await User.findById(id);
+      user.status = status;
+      if (status===status)
+      {user.currentChat = "";}
+      await user.save();
 
+      //TODO can delete this line
+      const contacts = await User.find({_id:{$eq:id}}).select(["contacts"]);
+      const contactsData = (contacts[0].contacts)
+      const contactsList=[]
+      for (const key in contactsData)
+      {
+         contactsList.push(key);
+      }
+      return contactsList
 
+  }
+  catch(ex){}
+  }
+
+  module.exports.getAllSearchUsers = async(req,res,next) =>
+  {
+   try {
+    const userContacts = await User.find({username:{$eq:req.params.username}}).select(["contacts"]);
+    const contactsData = (userContacts[0].contacts)
+    const contactsList=[]
+    for (const key in contactsData)
+    {
+       contactsList.push(key);
+    }
+     const contacts = await User.find({username:{$regex: new RegExp(`${req.params.value}`, "i"),$ne: req.params.username
+    },_id: { $nin: contactsList}}).select(["_id","username","avatarImage"]);
+     console.log("contacts",contacts)
+     return res.json(contacts);
+   } catch (ex) {
+     return res.status(500).json({
+       success: false,
+       error: "Server Error"
+     });
+   }
+ };
+ 

@@ -7,7 +7,8 @@ const User = require("./model/userModel")
 //userRoutes.js
 const userRoutes = require("./routes/userRoutes")
 const messageRoutes = require("./routes/messageRoutes")
-const gameRoutes = require("./routes/gameRoutes")
+const gameRoutes = require("./routes/gameRoutes");
+const { changeStatus } = require("./controllers/usersController");
 
 
 const app = express();
@@ -52,26 +53,37 @@ const io = socket(server,
    // Change the ping timeout to 10 seconds
    io.pingTimeout = process.env.PING_TIMEOUT;
 
-    global.onlineUsers = new Map();
-    const changeStatus = async (id,status) =>  
-    {
-    try{
-        const user = await User.findById(id);
-        user.status = status;
-        if (status==="offline")
-        {user.currentChat = "";}
-        await user.save();
+   
 
-    }
-    catch(ex){}
-    }
+
+
+
+
+    global.onlineUsers = new Map();
     io.on("connection",(socket)=>{
+
+        const changeStatusAndEmit=(id,status)=>{
+
+            changeStatus(id,status).then((socketArray)=>
+            {
+                console.log("socketArray",socketArray)
+               if(socketArray!==undefined&&socketArray!==[])
+               for (let i = 0; i < socketArray.length; i++) {
+                  let sendUserSocket = onlineUsers[socketArray[i]]
+                  console.log("EMIT TO=>",sendUserSocket)
+                  socket.to(sendUserSocket).emit("contacts-updated", {
+                      id:id,
+                      status:status
+                  })};
+            }
+            )
+        }
 
         socket.on("add-user",(userId,status)=>
         {
             onlineUsers[userId] = socket.id;
-            changeStatus(userId,status)
             console.log(onlineUsers)
+            changeStatusAndEmit(userId,status)
         });
         socket.on("send-msg",(data)=>
         {
@@ -91,13 +103,14 @@ const io = socket(server,
                 socket.to(sendUserSocket).emit("get-board",data.board)
         });
            socket.on('disconnect', function(){
-            Object.keys(onlineUsers).forEach(key => {
+            for (let key in onlineUsers) {
                 if (onlineUsers[key] === socket.id) {
-                 changeStatus(key,"offline")
+                changeStatusAndEmit(key,process.env.STATUS_OFFLINE)
                  console.log('user ' + key + ' disconnected');
                  delete onlineUsers[key];
-                }
-              });
+                 break;
+                }  
+              };
           });
 
     }

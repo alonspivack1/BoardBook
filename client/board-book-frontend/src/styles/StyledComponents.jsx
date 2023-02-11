@@ -371,10 +371,24 @@ background-color: #080420;
     gap: 1rem;
     align-items: center;
     transition: 0.5s ease-in-out;
+    
     .avatar {
+      border-radius: 50%;
+      height: 3.19rem;
       img {
+        border: 1.5px solid white;
+        border-radius: 50%;
         height: 3rem;
       }
+    }
+    .${process.env.REACT_APP_STATUS_ONLINE}{
+      border: 1.5px solid green;
+    }
+    .${process.env.REACT_APP_STATUS_OFFLINE}{
+      border: 1.5px solid red;
+    }
+    .${process.env.REACT_APP_STATUS_INGAME}{
+      border: 1.5px solid orange;
     }
     .username {
       h3 {

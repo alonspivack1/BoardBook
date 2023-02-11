@@ -11,6 +11,8 @@ export const recieveMessageRoute = `${host}/api/messages/getmsg`
 export const createRoomRoute = `${host}/api/game/addgameroom`
 export const updateGameRoute = `${host}/api/game/updategame`
 export const getRoomRoute = `${host}/api/game/gameroom`
+export const SearchUsersRoute = `${host}/api/auth/searchusers`
+
 
 
 

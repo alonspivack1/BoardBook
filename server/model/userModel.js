@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
   status:
   {
     type:String,
-    default:"offline"
+    default:process.env.STATUS_OFFLINE
   },
   gameId:
   {
