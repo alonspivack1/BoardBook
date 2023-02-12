@@ -200,8 +200,7 @@ module.exports.changeChat  = async (req, res, next) => {
        contactsList.push(key);
     }
      const contacts = await User.find({username:{$regex: new RegExp(`${req.params.value}`, "i"),$ne: req.params.username
-    },_id: { $nin: contactsList}}).select(["_id","username","avatarImage"]);
-     console.log("contacts",contacts)
+    },_id: { $nin: contactsList}}).select(["_id","username","avatarImage","status"]);
      return res.json(contacts);
    } catch (ex) {
      return res.status(500).json({
@@ -210,4 +209,34 @@ module.exports.changeChat  = async (req, res, next) => {
      });
    }
  };
+ 
+ module.exports.addContact = async(req,res,next) =>
+ {
+  try{
+    const { firstID, secondID} = req.body;
+    await User.updateOne({ _id: firstID }, { $set: { [`contacts.${secondID}`]: false } });
+    await User.updateOne({ _id: secondID }, { $set: { [`contacts.${firstID}`]: false } });
+
+    return res.status(200).json({ success: true});
+  }
+  catch(ex){
+    return res.json({
+      success: false});
+  }
+ }
+ module.exports.deleteContact = async(req, res, next) => {
+  try {
+    const { firstID, secondID } = req.body;
+
+    await User.updateOne({ _id: firstID }, { $unset: { [`contacts.${secondID}`]: 1 } });
+    await User.updateOne({ _id: secondID }, { $unset: { [`contacts.${firstID}`]: 1 } });
+
+    return res.status(200).json({ success: true });
+  } catch (ex) {
+    console.error(ex);
+    return res.json({
+      success: false
+    });
+  }
+};
  

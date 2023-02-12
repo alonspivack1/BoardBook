@@ -14,10 +14,8 @@ background-color: #131324;
   width: 85vw;
   background-color: #00000076;
   display: grid;
-  grid-template-columns: 25% 75%;
-  @media screen and (min-width: 720px) and (max-width: 1080px) {
-    grid-template-columns: 35% 65%;
-  }
+  grid-template-columns minmax(400px,25vw) minmax(0,auto);
+}
 }
 `;
 const LoginFormContainerStyle = styled.div`
@@ -305,7 +303,7 @@ padding: 0 2rem;
 `;
 const ContactsContainerStyle = styled.div`
 display: grid;
-grid-template-rows: 7% 4% 79% 11%;
+grid-template-rows: minmax(50px,7%) minmax(50px,4%) 79% 11%;
 overflow: hidden;
 background-color: #080420;
 .brand {
@@ -321,11 +319,18 @@ background-color: #080420;
     text-transform: uppercase;
   }
 }
+.searcharea{
+  display: flex;
+  align-items: center;
+  gap: 5rem;
+
+}
 .fragment {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
+  padding-bottom:7px;
+  gap: 1rem;
     button
   {
     width: 5rem;
@@ -337,12 +342,11 @@ background-color: #080420;
     border:1px solid;
 
   }
+  
   .selected{   
     background-color: #ffffff39;
     border:0.5px solid;
     opacity:0.9;
-
-
   }
 
 }
@@ -366,7 +370,7 @@ background-color: #080420;
     cursor: pointer;
     width: 90%;
     border-radius: 0.2rem;
-    padding: 0.4rem;
+    padding: 0.5rem;
     display: flex;
     gap: 1rem;
     align-items: center;
@@ -374,7 +378,7 @@ background-color: #080420;
     
     .avatar {
       border-radius: 50%;
-      height: 3.19rem;
+      height: 3.25rem;
       img {
         border: 1.5px solid white;
         border-radius: 50%;
@@ -382,14 +386,15 @@ background-color: #080420;
       }
     }
     .${process.env.REACT_APP_STATUS_ONLINE}{
-      border: 1.5px solid green;
+      border: 2px solid green;
     }
     .${process.env.REACT_APP_STATUS_OFFLINE}{
-      border: 1.5px solid red;
+      border: 2px solid red;
     }
     .${process.env.REACT_APP_STATUS_INGAME}{
-      border: 1.5px solid orange;
+      border: 2px solid orange;
     }
+   
     .username {
       h3 {
         color: white;
@@ -452,10 +457,7 @@ border-radius: 0.5rem;
 background-color: #9a86f3;
 border: none;
 cursor: pointer;
-svg {
-  font-size: 1.3rem;
-  color: #ebe7ff;
-}
+
 `;
 const WelcomeContainerStyle = styled.div`
 display: flex;

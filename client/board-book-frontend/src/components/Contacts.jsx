@@ -4,17 +4,20 @@ import Logo from "../assets/logo.svg";
 import Logout from "./Logout";
 import Avatars from "../styles/AvatarsArray";
 import { AiOutlineMessage } from "react-icons/ai";
+import { MdPersonSearch,MdOutlineCancel } from "react-icons/md";
 import axios from "axios";
-import { SearchUsersRoute } from "../utils/APIRoutes";
-
- export default function Contacts({ contacts, currentUserImage,currentUserName,changeChat, gameOffer}) {
+import { SearchUsersRoute,addContactRoute,deleteContactRoute } from "../utils/APIRoutes";
+import styles from "../styles/IconStyles.module.css"
+ export default function Contacts({ contacts, currentUserImage,currentUserName,changeChat, gameOffer,currentUserID,deleteContact,addContact}) {
    const [currentSelected, setCurrentSelected] = useState(undefined);
    const [contactsOnline,setContactsOnline] = useState(true);
    const [contactsInGame,setContactsInGame] = useState(true);
    const [contactsOffline,setContactsOffline] = useState(true);
-   const [Search,setSearch] = useState(true);
+   const [Search,setSearch] = useState(false);
    const [searchValue,setSearchValue] = useState("");
    const [contactsSearch,setContactsSearch] = useState();
+   const [timer, setTimer] = useState(null);
+
 
    const changeCurrentChat = (index, contact) => {
     if(gameOffer===false)
@@ -22,7 +25,24 @@ import { SearchUsersRoute } from "../utils/APIRoutes";
       setCurrentSelected(index);
       changeChat(contact);
     }
-
+   };
+   const handleAddContact = async (contact) => {
+    await axios.post(addContactRoute, {firstID:currentUserID, secondID:contact._id}).then((data)=>
+    {
+      if(data.data.success)
+      {
+        addContact(contact)
+        setSearchValue("")
+        setContactsSearch(undefined)
+        setSearch(false) 
+      
+      }
+      else
+      {
+        alert("network error")
+      }
+    })
+    
    };
    const DisplayContactDependStatus=(status)=>
    {
@@ -53,8 +73,32 @@ import { SearchUsersRoute } from "../utils/APIRoutes";
     }
     return false
    }
+   
 
+  const handleHoldStart = (contactID,index) => {
+    setTimer(setTimeout(() => handleDeleteContact(contactID,index), 3000));
+  };
 
+  const handleHoldEnd = () => {
+    clearTimeout(timer);
+  };
+
+  const handleDeleteContact = async (contactID,index) => {
+    await axios.post(deleteContactRoute, {firstID:currentUserID, secondID:contactID}).then((data)=>{
+      if(data.data.success)
+      {
+        clearTimeout(timer);
+        deleteContact(index)
+        changeCurrentChat(undefined,undefined);
+      }
+      else
+      {
+        alert("network error")
+      }
+    })
+   }; 
+   
+   
    const handleSearch = async (value)=>{
     setSearchValue(value)
 
@@ -80,12 +124,15 @@ import { SearchUsersRoute } from "../utils/APIRoutes";
           </div>
           {Search===true?(
             <>
-            <div>
+            <div className="searcharea">
+            <MdOutlineCancel className={styles.backtocontacts} onClick={()=>{  setContactsSearch(undefined);setSearchValue(""); setSearch(!Search)}}/>
               <input
+                maxLength={20}
                 type="text"
-                placeholder="search contact"
+                placeholder="search user"
                 value={searchValue}
-                onChange={(event) => handleSearch(event.target.value)}/>
+                onChange={(event) => handleSearch(event.target.value)} autoFocus/>
+
             </div>
            
            {contactsSearch?(       
@@ -100,7 +147,7 @@ import { SearchUsersRoute } from "../utils/APIRoutes";
                 <div 
                   key={contact._id}
                   className="contact"
-                  onClick={() => changeCurrentChat(index, contact)} >
+                  onClick={() => handleAddContact(contact)} >
                   <div className={`avatar`}>
                     
                     <img
@@ -117,7 +164,7 @@ import { SearchUsersRoute } from "../utils/APIRoutes";
           </div>
             </>
             ):(<div className="username">
-              <h3 style={{ color: 'white' }}>Search with at least 3 chars and max 20</h3>
+              <h3 style={{ color: 'white' }}>Please enter at least 3 characters to search...</h3>
             </div>)}
           
             </>
@@ -135,6 +182,7 @@ import { SearchUsersRoute } from "../utils/APIRoutes";
             <button onClick={()=>setContactsOffline((prev)=>!prev)}
               className={`${contactsOffline ? "selected" : ""}`}
               >offline</button>
+              <MdPersonSearch className={styles.search} onClick={()=> {changeCurrentChat(undefined,undefined); setSearch(!Search)}}/>
 
           </div>
           <div className="contacts">
@@ -144,6 +192,7 @@ import { SearchUsersRoute } from "../utils/APIRoutes";
                 
                 <div 
                   key={contact._id}
+                  onMouseDown={()=>handleHoldStart(contact._id,index)} onMouseUp={()=>handleHoldEnd()}
                   className={`contact ${index === currentSelected ? "selected" : ""}`}
                   onClick={() => changeCurrentChat(index, contact)} >
                   <div className={`avatar ${contact.status}`}>
@@ -158,12 +207,7 @@ import { SearchUsersRoute } from "../utils/APIRoutes";
                   </div>
                   <div> {(contact.Notification)?
                   (
-                   <AiOutlineMessage style={{
-                    height: "20px",
-                    width: "20px",
-                    color: "white"
-                  }}/>
-                    
+                   <AiOutlineMessage className={styles.notification}/>   
                   ):""}</div>
                 </div>
               );

@@ -71,7 +71,7 @@ const io = socket(server,
                for (let i = 0; i < socketArray.length; i++) {
                   let sendUserSocket = onlineUsers[socketArray[i]]
                   console.log("EMIT TO=>",sendUserSocket)
-                  socket.to(sendUserSocket).emit("contacts-updated", {
+                  socket.to(sendUserSocket).emit("contact-status-updated", {
                       id:id,
                       status:status
                   })};

@@ -2,7 +2,7 @@ import React, { useEffect, useState,useRef, useContext } from "react";
 import { ChatContainerStyle } from "../styles/StyledComponents";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getUserByTokenRoute,allContactsRoute ,createRoomRoute,ChangeChat} from "../utils/APIRoutes";
+import { getUserByTokenRoute,allContactsRoute ,createRoomRoute,changeChatRoute} from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
 import ChatContainer from "../components/ChatContainer";
 import { SocketContext } from "../services/socket";
@@ -49,10 +49,10 @@ import { SocketContext } from "../services/socket";
   useEffect(()=>
   {
     console.log("Update Contacts")
-    //socket.off("contacts-updated")
+    //?socket.off("contact-status-updated")
     if(contacts)
     {
-      socket.on("contacts-updated",(data)=>
+      socket.on("contact-status-updated",(data)=>
       {
         let tempContacts = [...contacts]
         for (var i = 0; i < tempContacts.length; i++) {
@@ -80,9 +80,17 @@ import { SocketContext } from "../services/socket";
   
   
   const handleChatChange = async (chat)=>{
-    chat.Notification=false
-    setCurrentChat(chat)
-    await axios.post(ChangeChat, {UserId:currentUser._id, ContactID:chat._id})
+    if(chat)
+    {
+      chat.Notification=false
+      setCurrentChat(chat)
+      await axios.post(changeChatRoute, {UserId:currentUser._id, ContactID:chat._id})
+    }
+    else
+    {
+      setCurrentChat("")
+    }
+
     }
   
   const handleGameOffer = (bool) => {
@@ -93,8 +101,20 @@ import { SocketContext } from "../services/socket";
     const index = updatedContacts.findIndex(user => user._id === id);
     updatedContacts[index].Notification=true
     setContacts(updatedContacts)
-
   };
+
+  const deleteContact = (index)=>
+  {
+    let updatedContacts =[...contacts]
+    updatedContacts.splice(index, 1);
+    setContacts(updatedContacts)
+  }
+  const addContact = (contact)=>
+  {
+      let updatedContacts =[...contacts]
+      updatedContacts.push(contact)
+      setContacts(updatedContacts)
+  }
   const handleCreateRoom = async () => {
 
   
@@ -128,9 +148,8 @@ import { SocketContext } from "../services/socket";
       (
         <ChatContainerStyle>
         <div className="container">
-            <Contacts currentUserImage={currentUser.avatarImage} currentUserName ={currentUser.username} gameOffer={gameOffer} contacts={contacts} changeChat={handleChatChange} />
-              <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} handleContacts={handleContacts}currentChat={currentChat} currentUser={currentUser} socket={socket} />
-  
+            <Contacts currentUserImage={currentUser.avatarImage} currentUserID ={currentUser._id}  currentUserName ={currentUser.username} gameOffer={gameOffer} contacts={contacts} changeChat={handleChatChange} deleteContact={deleteContact} addContact={addContact} />
+              <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} handleContacts={handleContacts}currentChat={currentChat} currentUser={currentUser} socket={socket} /> 
           </div>
         </ChatContainerStyle>
       ):""}
