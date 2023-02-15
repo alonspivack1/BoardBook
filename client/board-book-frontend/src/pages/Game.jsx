@@ -30,7 +30,6 @@ export default function Game() {
     useEffect(()=>{
       if(socket&&roomData&&roomId)
       {   
-      
           console.log(roomId)
           socket.off(`${roomId}`)
           socket.on(`${roomId}`,(board)=>

@@ -34,7 +34,6 @@ module.exports.register = async (req,res,next) =>{
   }
     };
  
- 
 module.exports.login = async (req,res,next) =>{
 try
 {
@@ -111,10 +110,6 @@ const GetContactData = async (id,bool)=>
 catch(ex){}
 }
 
- 
- 
-
-
 module.exports.logOut = (req, res, next) => {
   try {
     if (!req.params.token) return res.json({ msg: "token is required " });
@@ -166,7 +161,8 @@ module.exports.changeChat  = async (req, res, next) => {
     res.status(400).json({ message: "Error updating notification", error });
   }
   };
-  module.exports.changeStatus = async (id,status) =>  
+
+  module.exports.changeStatus = async (id,status,returnContactsList,deleteGameID=false) =>  
   {
   try{
       const user = await User.findById(id);
@@ -175,21 +171,27 @@ module.exports.changeChat  = async (req, res, next) => {
         if(user.gameId!="")
         return undefined
       }
-      user.status = status;
-      if (status===status)
+
+      if (status===process.env.STATUS_ONLINE===user.status)
       {user.currentChat = "";}
-      await user.save();
-
-      //TODO can delete this line
-      const contacts = await User.find({_id:{$eq:id}}).select(["contacts"]);
-      const contactsData = (contacts[0].contacts)
-      const contactsList=[]
-      for (const key in contactsData)
+      user.status = status;
+      if(deleteGameID===true)
+      {user.gameId=""}
+      await user.save();     
+      if(returnContactsList===true)
       {
-         contactsList.push(key);
+        const contacts = user.contacts
+        const contactsData = (contacts[0].contacts)
+        const contactsList=[]
+        for (const key in contactsData)
+        {contactsList.push(key);}
+        return contactsList
       }
-      return contactsList
-
+      else
+      {
+        return undefined
+      }
+  
   }
   catch(ex){}
   }

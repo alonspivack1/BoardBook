@@ -62,9 +62,8 @@ const io = socket(server,
     global.onGameUsers = new Map();
     io.on("connection",(socket)=>{
 
-        const changeStatusAndEmit=(id,status)=>{
-            let status1
-            changeStatus(id,status).then((socketArray)=>
+        const changeStatusAndEmit=(id,status,returnContactsList,deleteGameID=false)=>{
+            changeStatus(id,status,returnContactsList,deleteGameID).then((socketArray)=>
             {
                 if(socketArray)
                 {
@@ -85,12 +84,12 @@ const io = socket(server,
         {
             onlineUsers[userId] = socket.id;
             console.log(onlineUsers)
-            changeStatusAndEmit(userId,status)
+            changeStatusAndEmit(userId,status,false,false)
         });
         socket.on("add-game-user",(userId,status)=>
         {
             onGameUsers[userId] = socket.id;
-            changeStatusAndEmit(userId,status)
+            changeStatusAndEmit(userId,status,false,false)
         });
         socket.on("send-msg",(data)=>
         {
@@ -136,7 +135,7 @@ const io = socket(server,
                     id=key
                     if(onGameUsers[id]===undefined)
                     {
-                        changeStatusAndEmit(id,process.env.STATUS_OFFLINE)
+                        changeStatusAndEmit(id,process.env.STATUS_OFFLINE,false,false)
                         console.log('user ' + id + ' disconnected');
                         delete onlineUsers[id];
                         break;
@@ -159,14 +158,14 @@ const io = socket(server,
                         id=key
                         if(onlineUsers[id]===undefined)
                         {
-                            changeStatusAndEmit(id,process.env.STATUS_OFFLINE)
+                            changeStatusAndEmit(id,process.env.STATUS_OFFLINE,false,true)
                             console.log('user ' + id + ' disconnected');
                             delete onGameUsers[id];
                             break;
                         }
                         else
                         {
-                            changeStatusAndEmit(id,process.env.STATUS_ONLINE)
+                            changeStatusAndEmit(id,process.env.STATUS_ONLINE,false,true)
                             delete onGameUsers[id];
                             break;
                         }
