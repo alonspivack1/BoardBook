@@ -181,9 +181,8 @@ module.exports.changeChat  = async (req, res, next) => {
       if(returnContactsList===true)
       {
         const contacts = user.contacts
-        const contactsData = (contacts[0].contacts)
         const contactsList=[]
-        for (const key in contactsData)
+        for (const key in contacts)
         {contactsList.push(key);}
         return contactsList
       }

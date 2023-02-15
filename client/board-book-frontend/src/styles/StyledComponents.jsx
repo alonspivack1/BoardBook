@@ -303,7 +303,7 @@ padding: 0 2rem;
 `;
 const ContactsContainerStyle = styled.div`
 display: grid;
-grid-template-rows: minmax(50px,7%) minmax(50px,4%) 79% 11%;
+grid-template-rows: minmax(50px,7%) minmax(50px,4%) 79% 9%;
 overflow: hidden;
 background-color: #080420;
 .brand {

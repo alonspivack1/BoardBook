@@ -79,17 +79,26 @@ const io = socket(server,
             }
             )
         }
-
+        
         socket.on("add-user",(userId,status)=>
         {
             onlineUsers[userId] = socket.id;
             console.log(onlineUsers)
-            changeStatusAndEmit(userId,status,false,false)
+            changeStatusAndEmit(userId,status,true,false)
         });
         socket.on("add-game-user",(userId,status)=>
         {
-            onGameUsers[userId] = socket.id;
-            changeStatusAndEmit(userId,status,false,false)
+            console.log("add-game",onGameUsers[userId])
+            if(onGameUsers[userId]===undefined)
+            {
+                onGameUsers[userId] = socket.id;
+                changeStatusAndEmit(userId,status,true,false)
+            }
+            else{
+                console.log("1")
+                socket.emit("double-entry")
+            }
+        
         });
         socket.on("send-msg",(data)=>
         {
@@ -135,7 +144,7 @@ const io = socket(server,
                     id=key
                     if(onGameUsers[id]===undefined)
                     {
-                        changeStatusAndEmit(id,process.env.STATUS_OFFLINE,false,false)
+                        changeStatusAndEmit(id,process.env.STATUS_OFFLINE,true,false)
                         console.log('user ' + id + ' disconnected');
                         delete onlineUsers[id];
                         break;
@@ -158,7 +167,7 @@ const io = socket(server,
                         id=key
                         if(onlineUsers[id]===undefined)
                         {
-                            changeStatusAndEmit(id,process.env.STATUS_OFFLINE,false,true)
+                            changeStatusAndEmit(id,process.env.STATUS_OFFLINE,true,true)
                             console.log('user ' + id + ' disconnected');
                             delete onGameUsers[id];
                             break;

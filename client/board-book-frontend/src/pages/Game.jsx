@@ -16,15 +16,23 @@ export default function Game() {
     const [roomData,setRoomData] = useState(undefined)
     const [currentUser,setCurrentUser] = useState(undefined)
     const [response,setResponse] = useState(undefined)
-
-
+    const ADD_GAME_USER = useRef()
  
-   
+    const closeTab = () => {
+      window.opener = null;
+      window.open("", "_self");
+      window.close();
+    };
     useEffect(() => {
       if(currentUser)
       {
         socket.emit("add-game-user",currentUser._id,process.env.REACT_APP_STATUS_INGAME)
+ 
+
+        
+
       }
+      
     },[socket,currentUser]);
 
     useEffect(()=>{
@@ -71,6 +79,7 @@ export default function Game() {
     {
       if(response)
       {
+       
         setRoomData(response.data.room)
       }    
     },[response])
@@ -82,6 +91,7 @@ export default function Game() {
         if(currentUser._id === roomData.users[0])
         {
           player.current=true
+          console.log("2")
           moveTurnTo.current = false
           enemy.current=roomData.users[1]
           if (roomData.turn===true)
@@ -96,6 +106,7 @@ export default function Game() {
         else if (roomData.users[1] === currentUser._id)
         {
           player.current=true
+          console.log("3")
           moveTurnTo.current = true
           enemy.current=roomData.users[0]
           if (roomData.turn===false)
@@ -107,9 +118,9 @@ export default function Game() {
             yourTurn.current=false
           }
         }
-
+  
         console.log("Yourturn", yourTurn.current)
-   
+     
       } 
     },[roomData])
 
