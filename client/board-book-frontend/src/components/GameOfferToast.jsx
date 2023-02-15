@@ -4,14 +4,16 @@ import "react-toastify/dist/ReactToastify.css";
 import { GameOfferToastStyle } from "../styles/GameOfferToastStyle";
 const GameOfferToast = (id,username) => {
   const handleButtonAccept = () => {
-    toast.dismiss();
+    window.open(`/gameroom/${id}`)
+    toast.dismiss(id);
+
+
   };
   const handleButtonDecline = () => {
     toast.dismiss(id);
-
+    
   };
  
-
   return (
           toast(
             <div style={GameOfferToastStyle.customToast}>

@@ -154,7 +154,7 @@ export default function Game() {
         <>
           <h1>Game {roomId}</h1> 
         {
-          roomData?<button onClick={ClickHandler}>CLickMe {roomData.score}</button>:""
+          roomData?<button onClick={ClickHandler}>yourTurn {yourTurn.current} {roomData.score}</button>:""
         }
         </>
  

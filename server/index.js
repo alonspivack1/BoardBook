@@ -136,7 +136,7 @@ const io = socket(server,
         })
       
            socket.on('disconnect', function(){
-        
+            console.log("1")
             let id
             for (let key in onlineUsers) {
                 if(onlineUsers[key]===socket.id)
@@ -174,7 +174,8 @@ const io = socket(server,
                         }
                         else
                         {
-                            changeStatusAndEmit(id,process.env.STATUS_ONLINE,false,true)
+                            console.log("2")
+                            changeStatusAndEmit(id,process.env.STATUS_ONLINE,true,true)
                             delete onGameUsers[id];
                             break;
                         }
