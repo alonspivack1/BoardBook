@@ -43,7 +43,6 @@ const server = app.listen(process.env.PORT,()=>{
 const io = socket(server,
     {
         cors:{
-            origin:"http://localhost:3000",
             credentials: true,
         },
     });
@@ -60,21 +59,24 @@ const io = socket(server,
 
 
     global.onlineUsers = new Map();
+    global.onGameUsers = new Map();
     io.on("connection",(socket)=>{
 
         const changeStatusAndEmit=(id,status)=>{
-
+            let status1
             changeStatus(id,status).then((socketArray)=>
             {
-                console.log("socketArray",socketArray)
-               if(socketArray!==undefined&&socketArray!==[])
-               for (let i = 0; i < socketArray.length; i++) {
-                  let sendUserSocket = onlineUsers[socketArray[i]]
-                  console.log("EMIT TO=>",sendUserSocket)
-                  socket.to(sendUserSocket).emit("contact-status-updated", {
-                      id:id,
-                      status:status
-                  })};
+                if(socketArray)
+                {
+                    if(socketArray!==undefined&&socketArray!==[])
+                    for (let i = 0; i < socketArray.length; i++) {
+                       let sendUserSocket = onlineUsers[socketArray[i]]
+                       socket.to(sendUserSocket).emit("contact-status-updated", {
+                           id:id,
+                           status:status
+                       })};
+                }
+            
             }
             )
         }
@@ -83,6 +85,11 @@ const io = socket(server,
         {
             onlineUsers[userId] = socket.id;
             console.log(onlineUsers)
+            changeStatusAndEmit(userId,status)
+        });
+        socket.on("add-game-user",(userId,status)=>
+        {
+            onGameUsers[userId] = socket.id;
             changeStatusAndEmit(userId,status)
         });
         socket.on("send-msg",(data)=>
@@ -96,21 +103,78 @@ const io = socket(server,
         });
         socket.on("set-board",(data)=>
         {
-                const sendUserSocket = onlineUsers[data.to]
-                //socket.emit("get-board",data.board) //!to spectate, but the "get-board" need changed to string of GameID
-                //socket.broadcast.emit("get-board",data.board) 
-                socket.emit("get-board",data.board)
-                socket.to(sendUserSocket).emit("get-board",data.board)
+               console.log(data.roomId)
+                socket.emit(`${data.roomId}`,data.board)
+                socket.broadcast.emit(`${data.roomId}`,data.board)
         });
+        socket.on("add-contact",(data)=>
+        {
+            const sendUserSocket = onlineUsers[data.to]
+            socket.to(sendUserSocket).emit("add-contact",data.contact)
+        });
+        socket.on("delete-contact",(data)=>
+        {
+            const sendUserSocket = onlineUsers[data.to]
+            socket.to(sendUserSocket).emit("delete-contact",data.contact)
+        });
+        socket.on("game-offer",(data)=>
+        {
+            const sendUserSocket = onlineUsers[data.to]
+            socket.to(sendUserSocket).emit("game-offer",{
+                from:data.from,
+                roomId:data.roomId
+            })
+
+        })
+      
            socket.on('disconnect', function(){
+        
+            let id
             for (let key in onlineUsers) {
-                if (onlineUsers[key] === socket.id) {
-                changeStatusAndEmit(key,process.env.STATUS_OFFLINE)
-                 console.log('user ' + key + ' disconnected');
-                 delete onlineUsers[key];
-                 break;
-                }  
-              };
+                if(onlineUsers[key]===socket.id)
+                {
+                    id=key
+                    if(onGameUsers[id]===undefined)
+                    {
+                        changeStatusAndEmit(id,process.env.STATUS_OFFLINE)
+                        console.log('user ' + id + ' disconnected');
+                        delete onlineUsers[id];
+                        break;
+                    }
+                    else
+                    {
+                        delete onlineUsers[id];
+                        break;
+                    }
+                }
+            }
+            if(!id)
+            {
+               
+
+                for (let key in onGameUsers) {
+
+                    if(onGameUsers[key]===socket.id)
+                    {
+                        id=key
+                        if(onlineUsers[id]===undefined)
+                        {
+                            changeStatusAndEmit(id,process.env.STATUS_OFFLINE)
+                            console.log('user ' + id + ' disconnected');
+                            delete onGameUsers[id];
+                            break;
+                        }
+                        else
+                        {
+                            changeStatusAndEmit(id,process.env.STATUS_ONLINE)
+                            delete onGameUsers[id];
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            
           });
 
     }

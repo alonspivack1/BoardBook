@@ -7,6 +7,7 @@ import {ToastContainer,toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"
 import axios from "axios";
 import Avatars from '../styles/AvatarsArray';
+import { ValidationToast } from '../styles/ValidationToast';
 
 import { registerRoute } from '../utils/APIRoutes';
 
@@ -26,14 +27,6 @@ export default function Register() {
         AvatarImage:1
     })
 
-    const toastOptions = {
-        position: "bottom-right",
-        autoClose: 8000,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark"
-        }
-        
         useEffect(() => {
           if (localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)) {
           navigate("/");
@@ -50,7 +43,7 @@ export default function Register() {
                     {username,password,email,AvatarImage}).catch();
             if (data.status===false)
             {
-                toast.error(data.msg,toastOptions);
+                toast.error(data.msg,ValidationToast);
             }
             if (data.status===true)
             {
@@ -70,24 +63,24 @@ export default function Register() {
         const { username, email, password, confirmPassword } = values;
         if (password !== confirmPassword) {
         toast.error("password and confirm password should be same.",
-        toastOptions);
+        ValidationToast);
         return false;
         }else if (username.length<3)
         {
             toast.error(
-                "Username should be greater than 3 characters",toastOptions
+                "Username should be greater than 3 characters",ValidationToast
             );return false
         }
         else if (password.length<8)
         {
             toast.error(
-                "Password should be equal or  greater than 8 characters",toastOptions
+                "Password should be equal or  greater than 8 characters",ValidationToast
             );return false
         }
         else if (email==="")
         {
             toast.error(
-                "email is required",toastOptions
+                "email is required",ValidationToast
             );return false
         }
         return true

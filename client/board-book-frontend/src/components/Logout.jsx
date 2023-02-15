@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPowerOff } from "react-icons/fa";
-import { LogoutButtonStyle } from "../styles/StyledComponents";
 import styles from "../styles/IconStyles.module.css"
 
 import axios from "axios";
@@ -18,6 +17,6 @@ export default function Logout() {
     }
   };
   return (
-      <FaPowerOff className={styles.logout} />
+      <FaPowerOff onClick={()=>handleClick()} className={styles.logout} />
   );
 }

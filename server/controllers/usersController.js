@@ -132,7 +132,7 @@ module.exports.getUserByToken =async (req,res,next)=>
     return res.json(undefined)
     const objectId = new ObjectId(id);
     const user = await User.find({_id:{$eq:objectId}}).select([
-      "username","avatarImage","_id",
+      "username","avatarImage","_id","status"
     ])
     return res.json(user);
   }
@@ -170,6 +170,11 @@ module.exports.changeChat  = async (req, res, next) => {
   {
   try{
       const user = await User.findById(id);
+      if((user.status===process.env.STATUS_INGAME)&&(status===process.env.STATUS_ONLINE))
+      {
+        if(user.gameId!="")
+        return undefined
+      }
       user.status = status;
       if (status===status)
       {user.currentChat = "";}

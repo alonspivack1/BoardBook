@@ -6,6 +6,11 @@ import { getUserByTokenRoute,allContactsRoute ,createRoomRoute,changeChatRoute} 
 import Contacts from "../components/Contacts";
 import ChatContainer from "../components/ChatContainer";
 import { SocketContext } from "../services/socket";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import GameOfferToast from "../components/GameOfferToast";
+import { ValidationToast } from "../styles/ValidationToast";
+
 
  export default function Chat() {
   
@@ -16,8 +21,9 @@ import { SocketContext } from "../services/socket";
    const [currentChat, setCurrentChat] = useState(undefined);
    const [gameOffer, setGameOffer] = useState(false);
 
-   const messageSentStatus = useRef(false);
 
+
+   
    useEffect(() => {
     async function fetchData() {
       if (!localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)) {
@@ -50,6 +56,7 @@ import { SocketContext } from "../services/socket";
   {
     console.log("Update Contacts")
     //?socket.off("contact-status-updated")
+    //?socket.off("contact-users-updated")
     if(contacts)
     {
       socket.on("contact-status-updated",(data)=>
@@ -63,7 +70,23 @@ import { SocketContext } from "../services/socket";
         }
         setContacts(tempContacts)
       })
-      
+      socket.on("add-contact",(contact)=>
+      {
+        let tempContacts = [...contacts]
+        tempContacts.push(contact)
+        setContacts(tempContacts)
+      })
+      socket.on("delete-contact",(contact)=>
+      {
+        let tempContacts = [...contacts]
+        const index = tempContacts.findIndex(user => user._id === contact._id);
+        tempContacts.splice(index, 1);
+        setContacts(tempContacts)
+      })   
+      socket.on("game-offer",(data)=>
+      {
+        GameOfferToast(data.roomId,data.from)
+      })  
     }
   },[socket,contacts])
 
@@ -93,8 +116,8 @@ import { SocketContext } from "../services/socket";
 
     }
   
-  const handleGameOffer = (bool) => {
-    setGameOffer(bool)
+  const handleGameOffer = () => {
+  
   };
   const handleContacts = async (id) => {
     let updatedContacts = [...contacts]
@@ -105,51 +128,65 @@ import { SocketContext } from "../services/socket";
 
   const deleteContact = (index)=>
   {
+
+    socket.emit("delete-contact",{
+      to: contacts[index]._id,
+      contact: currentUser
+    })
+    
     let updatedContacts =[...contacts]
     updatedContacts.splice(index, 1);
     setContacts(updatedContacts)
   }
   const addContact = (contact)=>
   {
+    socket.emit("add-contact",{
+      to: contact._id,
+      contact: currentUser
+    })
       let updatedContacts =[...contacts]
       updatedContacts.push(contact)
       setContacts(updatedContacts)
+
   }
   const handleCreateRoom = async () => {
 
-  
+    if(currentChat!=="")
+    {
+      await axios.post(createRoomRoute, {
+        users: [currentUser._id,currentChat._id]
+      }
+      ).then((response) => {
+        if(response.data.gameCreateSuccessfully)
+          {
+             socket.emit("game-offer",{
+              from:currentUser.username,
+              to:currentChat._id,
+              roomId:response.data.roomId
+            }).then(window.open(`/gameroom/${response.data.roomId}`))
 
-    // if(currentChat!=="")
-    // {
-    //   await axios.post(createRoomRoute, {
-    //     users: [currentUser._id,currentChat._id]
-    //   }
-    //   ).then((response) => {
-    //     messageSentStatus.current = response.data.sentSuccessfully
-    //     if(messageSentStatus.current)
-    //       {
-    //         window.open(`/gameroom/${response.data.roomId}`)
-  
-    //       }
-    //   }).catch((error)=>alert("1"))
-    //   if (messageSentStatus.current)
-    //   {
-    //   }
-    //   else{
-    //     alert("2")
-    //   }
-    // };
+          }
+          else
+          {
+            toast.error(response.data.msg,ValidationToast);
+          }
+      }).catch((error)=> toast.error(error,ValidationToast))
+       
+
+    };
     }
- 
-
+    
+     
   return (
     <>
+      
+    <ToastContainer/>
       {currentUser?
       (
         <ChatContainerStyle>
         <div className="container">
             <Contacts currentUserImage={currentUser.avatarImage} currentUserID ={currentUser._id}  currentUserName ={currentUser.username} gameOffer={gameOffer} contacts={contacts} changeChat={handleChatChange} deleteContact={deleteContact} addContact={addContact} />
-              <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} handleContacts={handleContacts}currentChat={currentChat} currentUser={currentUser} socket={socket} /> 
+              <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} handleContacts={handleContacts}currentChat={currentChat} currentUser={currentUser} socket={socket} handleCreateRoom={handleCreateRoom} /> 
           </div>
         </ChatContainerStyle>
       ):""}

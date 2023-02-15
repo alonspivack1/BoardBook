@@ -3,12 +3,10 @@ import { GiRollingDices } from "react-icons/gi";
 import { GameOfferButtonStyle } from "../styles/StyledComponents";
 
 export default function GameOfferButton({handleGameOffer}) {
-  const handleClick =  () => {
-    handleGameOffer(true)
-    }
+
     return (
-        <GameOfferButtonStyle onClick={handleClick}>
-          <GiRollingDices />
+        <GameOfferButtonStyle onClick={()=>handleGameOffer()}>
+          <GiRollingDices/>
         </GameOfferButtonStyle>
       );
   };

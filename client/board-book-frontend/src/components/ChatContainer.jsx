@@ -5,11 +5,10 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute} from "../utils/APIRoutes";
 import Welcome from "./Welcome";
-import GameOfferDialog from "./GameOfferDialog";
 import GameOfferButton from "./GameOfferButton";
 import Avatars from "../styles/AvatarsArray";
 
-export default function ChatContainer({ currentUser,currentChat,socket,gameOffer,handleGameOffer,handleContacts}) {
+export default function ChatContainer({ currentUser,currentChat,socket,handleContacts,handleCreateRoom}) {
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
@@ -92,16 +91,6 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
   return (
     currentChat&&currentChat!==""?
     (
-      <>
-      {gameOffer===true?
-      (
-          <>
-                <GameOfferDialog gameOffer={gameOffer} handleGameOffer={handleGameOffer}/> 
-          </>
-      )
-      :
-      (
-        
         <ChatContainerContainerStyle>
         <div className="chat-header">
           <div className="user-details">
@@ -115,7 +104,7 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
               <h3>{currentChat.username}</h3>
             </div>
           </div>
-          <GameOfferButton handleGameOffer={handleGameOffer}/>
+          <GameOfferButton handleGameOffer={handleCreateRoom}/>
   
         </div>
         <div className="chat-messages">
@@ -137,9 +126,6 @@ export default function ChatContainer({ currentUser,currentChat,socket,gameOffer
         </div>
         <ChatInput handleSendMsg={handleSendMsg} />
       </ChatContainerContainerStyle>
-      )}
-    
-      </>
     )
   :(currentUser?(<Welcome/>):"")
     

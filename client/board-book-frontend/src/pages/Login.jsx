@@ -6,6 +6,7 @@ import Logo from "../assets/logo.svg";
 import {ToastContainer,toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"
 import axios from "axios";
+import { ValidationToast } from '../styles/ValidationToast';
 
 import { loginRoute } from '../utils/APIRoutes';
 
@@ -18,13 +19,7 @@ export default function Login() {
         password:"",
     })
 
-    const toastOptions = {
-        position: "bottom-right",
-        autoClose: 8000,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark"
-        }
+  
 
 
         useEffect(() => {
@@ -42,7 +37,7 @@ export default function Login() {
                     {username,password});
             if (data.status===false)
             {
-                toast.error(data.msg,toastOptions);
+                toast.error(data.msg,ValidationToast);
             }
             if (data.status===true)
             {
@@ -63,7 +58,7 @@ export default function Login() {
         if (username.length===0||password.length===0)
         {
             toast.error(
-                "Username and Password is required",toastOptions
+                "Username and Password is required",ValidationToast
             );return false
         }
         return true

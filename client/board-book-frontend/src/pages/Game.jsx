@@ -19,28 +19,28 @@ export default function Game() {
 
 
  
+   
     useEffect(() => {
-
       if(currentUser)
       {
-        socket.emit("add-user",currentUser._id,process.env.REACT_APP_STATUS_INGAME)
+        socket.emit("add-game-user",currentUser._id,process.env.REACT_APP_STATUS_INGAME)
       }
-   
-    },[currentUser,socket]);  
-    
+    },[socket,currentUser]);
 
     useEffect(()=>{
-      if(socket&&roomData)
+      if(socket&&roomData&&roomId)
       {   
-        //! move the socket.on to one time useEffect?
-        socket.off("get-board");
-        socket.on("get-board",(board)=>
+      
+          console.log(roomId)
+          socket.off(`${roomId}`)
+          socket.on(`${roomId}`,(board)=>
         {
           let temproom = {...roomData}
           temproom.score = board
           temproom.turn = !roomData.turn
           setRoomData(temproom)
-        })}}) 
+        })
+    }},[roomData,socket,roomId]) 
 
 
     useEffect(() => {
@@ -75,6 +75,8 @@ export default function Game() {
         setRoomData(response.data.room)
       }    
     },[response])
+
+
     useEffect(()=>{
       if (currentUser&&response&&roomData) {
 
@@ -131,15 +133,16 @@ export default function Game() {
 
         const UpdateBoard = ()=>{
           socket.emit("set-board",{
-          to:enemy.current,
+          roomId:roomId,
           board:roomData.score+1
         })  
       }
 
+
+
       return (
         <>
           <h1>Game {roomId}</h1> 
-
         {
           roomData?<button onClick={ClickHandler}>CLickMe {roomData.score}</button>:""
         }
@@ -147,5 +150,6 @@ export default function Game() {
  
         
       )
+      
 }
 

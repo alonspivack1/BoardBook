@@ -132,7 +132,6 @@ input {
 }
 select {
   display: flex;
-  background-color: transparent;
   padding: 1rem;
   align-items: center;
   flex-direction: column;
@@ -140,6 +139,7 @@ select {
   border: 0.1rem solid #4e0eff;
   border-radius: 0.4rem;
   color: white;
+  background-color: #00100076;
   font-size: 1rem;
   &:focus {
     border: 0.1rem solid #997af0;
@@ -448,17 +448,6 @@ svg {
 }
 `;
 
-const LogoutButtonStyle = styled.button`
-display: flex;
-justify-content: center;
-align-items: center;
-padding: 0.5rem;
-border-radius: 0.5rem;
-background-color: #9a86f3;
-border: none;
-cursor: pointer;
-
-`;
 const WelcomeContainerStyle = styled.div`
 display: flex;
 justify-content: center;
@@ -474,5 +463,5 @@ span {
 `;
 
 export { ChatContainerStyle,LoginFormContainerStyle,RegisterFormContainerStyle,
-    ChatContainerContainerStyle,ChatInputContainerStyle,ContactsContainerStyle,
-    LogoutButtonStyle,WelcomeContainerStyle,GameOfferButtonStyle};
+    ChatContainerContainerStyle,ChatInputContainerStyle,ContactsContainerStyle
+    ,WelcomeContainerStyle,GameOfferButtonStyle};
