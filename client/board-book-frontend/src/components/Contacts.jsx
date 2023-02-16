@@ -8,7 +8,7 @@ import { MdPersonSearch,MdOutlineCancel } from "react-icons/md";
 import axios from "axios";
 import { SearchUsersRoute,addContactRoute,deleteContactRoute } from "../utils/APIRoutes";
 import styles from "../styles/IconStyles.module.css"
- export default function Contacts({ contacts, currentUserImage,currentUserName,changeChat, gameOffer,currentUserID,deleteContact,addContact}) {
+ export default function Contacts({ contacts, currentUserImage,currentUserName,changeChat,currentUserID,deleteContact,addContact}) {
    const [currentSelected, setCurrentSelected] = useState(undefined);
    const [contactsOnline,setContactsOnline] = useState(true);
    const [contactsInGame,setContactsInGame] = useState(true);
@@ -20,11 +20,9 @@ import styles from "../styles/IconStyles.module.css"
 
 
    const changeCurrentChat = (index, contact) => {
-    if(gameOffer===false)
-    {
       setCurrentSelected(index);
       changeChat(contact);
-    }
+    
    };
    const handleAddContact = async (contact) => {
     await axios.post(addContactRoute, {firstID:currentUserID, secondID:contact._id}).then((data)=>

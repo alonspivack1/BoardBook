@@ -104,7 +104,7 @@ export default function ChatContainer({ currentUser,currentChat,socket,handleCon
               <h3>{currentChat.username}</h3>
             </div>
           </div>
-          <GameOfferButton handleGameOffer={handleCreateRoom}/>
+          <GameOfferButton handleCreateRoom={handleCreateRoom}/>
   
         </div>
         <div className="chat-messages">

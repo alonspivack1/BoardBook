@@ -67,6 +67,7 @@ const io = socket(server,
             {
                 if(socketArray)
                 {
+    
                     if(socketArray!==undefined&&socketArray!==[])
                     for (let i = 0; i < socketArray.length; i++) {
                        let sendUserSocket = onlineUsers[socketArray[i]]
@@ -88,7 +89,6 @@ const io = socket(server,
         });
         socket.on("add-game-user",(userId,status)=>
         {
-            console.log("add-game",onGameUsers[userId])
             if(onGameUsers[userId]===undefined)
             {
                 onGameUsers[userId] = socket.id;

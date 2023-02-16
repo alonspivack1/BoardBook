@@ -4,11 +4,10 @@ const User = require("../model/userModel")
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const ObjectId = mongoose.Types.ObjectId;
+const Game = require("../model/gameModel");
+
 
 //! WHAT IS catch(ex){next(ex)}
-
-
-//module. is mean export just 1 function
 module.exports.register = async (req,res,next) =>{
   try
   {
@@ -66,7 +65,7 @@ module.exports.getAllUsers = async (req,res,next) =>{
   catch(ex){}
 }
   
- module.exports.getAllContacts = async(req,res,next) =>
+module.exports.getAllContacts = async(req,res,next) =>
  {
   try {
     const contacts = await User.find({_id:{$eq:req.params.id}}).select(["contacts"]);
@@ -162,22 +161,18 @@ module.exports.changeChat  = async (req, res, next) => {
   }
   };
 
-  module.exports.changeStatus = async (id,status,returnContactsList,deleteGameID=false) =>  
+module.exports.changeStatus = async (id,status,returnContactsList,deleteGameID=false) =>  
   {
   try{
       const user = await User.findById(id);
-      if((user.status===process.env.STATUS_INGAME)&&(status===process.env.STATUS_ONLINE))
-      {
-        if(user.gameId!="")
-        return undefined
-      }
-
       if (status===process.env.STATUS_ONLINE===user.status)
       {user.currentChat = "";}
       user.status = status;
       if(deleteGameID===true)
-      {user.gameId=""}
-      await user.save();     
+      {
+        await DeleteGameRoom(user.gameId)
+        user.gameId=""}
+        await user.save();     
       if(returnContactsList===true)
       {
         const contacts = user.contacts
@@ -193,6 +188,21 @@ module.exports.changeChat  = async (req, res, next) => {
   
   }
   catch(ex){}
+  }
+  const DeleteGameRoom = async (gameId)=>{
+    const game = await Game.findById(gameId);
+    console.log("GU=>",game)
+    const user1 = await User.findById(game.users[0])
+    const user2 = await User.findById(game.users[1])
+    console.log("user1=>",user1)
+    console.log("user2=>",user2)
+    if(user1.gameId==="",user2.gameId==="")
+    {
+      console.log("deleted=>",gameId)
+      await game.delete()
+    }
+
+
   }
 
   module.exports.getAllSearchUsers = async(req,res,next) =>
@@ -245,4 +255,12 @@ module.exports.changeChat  = async (req, res, next) => {
     });
   }
 };
- 
+module.exports.gameIdToUser = async(req, res, next) => {
+  const{id,gameId} = req.body;
+  const user = await User.findById(id)
+  user.gameId = gameId
+  await user.save()
+  return
+
+}
+

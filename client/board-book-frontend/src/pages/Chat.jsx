@@ -2,7 +2,7 @@ import React, { useEffect, useState,useRef, useContext } from "react";
 import { ChatContainerStyle } from "../styles/StyledComponents";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getUserByTokenRoute,allContactsRoute ,createRoomRoute,changeChatRoute} from "../utils/APIRoutes";
+import { getUserByTokenRoute,allContactsRoute ,createRoomRoute,changeChatRoute,setGameIdToUserRoute} from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
 import ChatContainer from "../components/ChatContainer";
 import { SocketContext } from "../services/socket";
@@ -19,7 +19,6 @@ import { ValidationToast } from "../styles/ValidationToast";
    const [contacts, setContacts] = useState([]);
    const [currentUser, setCurrentUser] = useState(undefined);
    const [currentChat, setCurrentChat] = useState(undefined);
-   const [gameOffer, setGameOffer] = useState(false);
 
 
 
@@ -152,8 +151,8 @@ import { ValidationToast } from "../styles/ValidationToast";
   const handleCreateRoom = async () => {
 
     if(currentChat!=="")
-    {
-      await axios.post(createRoomRoute, {
+    { 
+        await axios.post(createRoomRoute, {
         users: [currentUser._id,currentChat._id]
       }
       ).then((response) => {
@@ -163,8 +162,9 @@ import { ValidationToast } from "../styles/ValidationToast";
               from:currentUser.username,
               to:currentChat._id,
               roomId:response.data.roomId
-            }).then(window.open(`/gameroom/${response.data.roomId}`))
-
+            }).then(
+                window.open(`/gameroom/${response.data.roomId}`)
+             )
           }
           else
           {
@@ -185,8 +185,8 @@ import { ValidationToast } from "../styles/ValidationToast";
       (
         <ChatContainerStyle>
         <div className="container">
-            <Contacts currentUserImage={currentUser.avatarImage} currentUserID ={currentUser._id}  currentUserName ={currentUser.username} gameOffer={gameOffer} contacts={contacts} changeChat={handleChatChange} deleteContact={deleteContact} addContact={addContact} />
-              <ChatContainer gameOffer={gameOffer} handleGameOffer={handleGameOffer} handleContacts={handleContacts}currentChat={currentChat} currentUser={currentUser} socket={socket} handleCreateRoom={handleCreateRoom} /> 
+            <Contacts currentUserImage={currentUser.avatarImage} currentUserID ={currentUser._id}  currentUserName ={currentUser.username}  contacts={contacts} changeChat={handleChatChange} deleteContact={deleteContact} addContact={addContact} />
+              <ChatContainer handleContacts={handleContacts}currentChat={currentChat} currentUser={currentUser} socket={socket} handleCreateRoom={handleCreateRoom} /> 
           </div>
         </ChatContainerStyle>
       ):""}

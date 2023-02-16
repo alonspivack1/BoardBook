@@ -23,6 +23,7 @@ module.exports.addGameRoom = async (req, res, next) => {
     if (data)
     {
       currentUser.status = process.env.STATUS_INGAME
+      currentUser.gameId = data.id.toString()
       await currentUser.save();
       return res.json({roomId:`${data.id.toString()}`,gameCreateSuccessfully:true});
     }
