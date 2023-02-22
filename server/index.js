@@ -89,16 +89,8 @@ const io = socket(server,
         });
         socket.on("add-game-user",(userId,status)=>
         {
-            if(onGameUsers[userId]===undefined)
-            {
                 onGameUsers[userId] = socket.id;
                 changeStatusAndEmit(userId,status,true,false)
-            }
-            else{
-                console.log("1")
-                socket.emit("double-entry")
-            }
-        
         });
         socket.on("send-msg",(data)=>
         {
@@ -115,6 +107,12 @@ const io = socket(server,
                 socket.emit(`${data.roomId}`,data.board)
                 socket.broadcast.emit(`${data.roomId}`,data.board)
         });
+        socket.on("logout",(id)=>{
+            //! NEED FORCE EXIT FROM GAME!
+            changeStatusAndEmit(id,process.env.STATUS_OFFLINE,true,true)
+            delete onlineUsers[id]
+            delete onGameUsers[id]
+        })
         socket.on("add-contact",(data)=>
         {
             const sendUserSocket = onlineUsers[data.to]

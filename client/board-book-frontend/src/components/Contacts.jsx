@@ -8,7 +8,7 @@ import { MdPersonSearch,MdOutlineCancel } from "react-icons/md";
 import axios from "axios";
 import { SearchUsersRoute,addContactRoute,deleteContactRoute } from "../utils/APIRoutes";
 import styles from "../styles/IconStyles.module.css"
- export default function Contacts({ contacts, currentUserImage,currentUserName,changeChat,currentUserID,deleteContact,addContact}) {
+ export default function Contacts({ socket, contacts, currentUser,changeChat,deleteContact,addContact}) {
    const [currentSelected, setCurrentSelected] = useState(undefined);
    const [contactsOnline,setContactsOnline] = useState(true);
    const [contactsInGame,setContactsInGame] = useState(true);
@@ -25,7 +25,7 @@ import styles from "../styles/IconStyles.module.css"
     
    };
    const handleAddContact = async (contact) => {
-    await axios.post(addContactRoute, {firstID:currentUserID, secondID:contact._id}).then((data)=>
+    await axios.post(addContactRoute, {firstID:currentUser._id, secondID:contact._id}).then((data)=>
     {
       if(data.data.success)
       {
@@ -82,7 +82,7 @@ import styles from "../styles/IconStyles.module.css"
   };
 
   const handleDeleteContact = async (contactID,index) => {
-    await axios.post(deleteContactRoute, {firstID:currentUserID, secondID:contactID}).then((data)=>{
+    await axios.post(deleteContactRoute, {firstID:currentUser._id, secondID:contactID}).then((data)=>{
       if(data.data.success)
       {
         clearTimeout(timer);
@@ -102,7 +102,7 @@ import styles from "../styles/IconStyles.module.css"
 
     if(value.length>=3)
     {
-      const data = await axios.get(`${SearchUsersRoute}/${value}/${currentUserName}`);   
+      const data = await axios.get(`${SearchUsersRoute}/${value}/${currentUser.username}`);   
       setContactsSearch(data.data)
     }
     else
@@ -116,7 +116,7 @@ import styles from "../styles/IconStyles.module.css"
     <>
     <ContactsContainerStyle>
     <div className="brand">
-            <Logout/>
+            <Logout socket={socket} currentUserId={currentUser._id}/>
             <h3>{process.env.REACT_APP_NAME}</h3>
             <img src={Logo} alt="logo" />
           </div>
@@ -219,12 +219,12 @@ import styles from "../styles/IconStyles.module.css"
             <div className="avatar">
               
               <img
-                      src={Avatars[currentUserImage]}
+                      src={Avatars[currentUser.avatarImage]}
                       alt="avatar"
               />
             </div>
             <div className="username">
-              <h2>{currentUserName}</h2>
+              <h2>{currentUser.username}</h2>
             </div>
           </div>
     </ContactsContainerStyle>

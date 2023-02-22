@@ -185,8 +185,8 @@ import { ValidationToast } from "../styles/ValidationToast";
       (
         <ChatContainerStyle>
         <div className="container">
-            <Contacts currentUserImage={currentUser.avatarImage} currentUserID ={currentUser._id}  currentUserName ={currentUser.username}  contacts={contacts} changeChat={handleChatChange} deleteContact={deleteContact} addContact={addContact} />
-              <ChatContainer handleContacts={handleContacts}currentChat={currentChat} currentUser={currentUser} socket={socket} handleCreateRoom={handleCreateRoom} /> 
+            <Contacts currentUser ={currentUser} socket={socket} contacts={contacts} changeChat={handleChatChange} deleteContact={deleteContact} addContact={addContact} />
+              <ChatContainer handleContacts={handleContacts}currentChat={currentChat} currentUser={currentUser} socket={socket} handleCreateRoom={handleCreateRoom}  /> 
           </div>
         </ChatContainerStyle>
       ):""}
