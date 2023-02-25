@@ -233,6 +233,7 @@ const Move = (board,player,indexStart,indexEnd)=>
         board[enemyPlayer(player)].data[23-indexEnd]=0
         board[enemyPlayer(player)].eaten+=1
     }
+    return board
 }
 
 

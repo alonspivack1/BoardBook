@@ -45,7 +45,12 @@ const undo = ()=>{
 }
 
 
+const handleClick = (player,index)=>{
+    let temp =Move(board,player,index,5)
+    setBoard(temp)
+    setCanUndo((prev)=>!prev)
 
+}
   return (
     <>
         <button onClick={()=>handleDropDice()} disabled={!(turn&&canDropDice)}>ROLL</button>
@@ -53,14 +58,14 @@ const undo = ()=>{
         <button onClick={()=>handleFinish()} disabled={!(canFinish)}>FINISH={canFinish}</button> 
         {console.log(board)}
     
-        <div className = "board ">
+        <div className = "board">
         <div className = "space"></div>
         { Array.from({ length: 6 }, (_, i) => (
-        <Arrow key ={i} odd={i%2!==0} upcount={board[0].data[11-i]+board[1].data[12+i]} downcount={board[0].data[12+i]+board[1].data[11-i]} upmainplayer={board[0].data[11-i]>0} downmainplayer={board[0].data[12+i]>0} optionup ={canMovePiece(board,dice,0,11-i)} optiondown ={canMovePiece(board,dice,0,12+i)}/>
+        <Arrow key ={i} odd={i%2!==0} upcount={board[0].data[11-i]+board[1].data[12+i]} downcount={board[0].data[12+i]+board[1].data[11-i]} upmainplayer={board[0].data[11-i]>0} downmainplayer={board[0].data[12+i]>0} optionup ={canMovePiece(board,dice,0,11-i)} optiondown ={canMovePiece(board,dice,0,12+i)} onClick={handleClick} upIndex={11-i} downIndex={12+i} />
         ))}
-        <MiddleBar player0count={4} player1count={4}/>
+        <MiddleBar player0count={1} player1count={1}/>
         { Array.from({ length: 6 }, (_, i) => (
-        <Arrow key ={i} odd={i%2!==0} upcount={board[0].data[5-i]+board[1].data[18+i]} downcount={board[0].data[18+i]+board[1].data[5-i]} upmainplayer={board[0].data[5-i]>0} downmainplayer={board[0].data[18+i]>0}  optionup ={canMovePiece(board,dice,0,5-i)} optiondown ={canMovePiece(board,dice,0,18+i)}/>
+        <Arrow key ={i} odd={i%2!==0} upcount={board[0].data[5-i]+board[1].data[18+i]} downcount={board[0].data[18+i]+board[1].data[5-i]} upmainplayer={board[0].data[5-i]>0} downmainplayer={board[0].data[18+i]>0}  optionup ={canMovePiece(board,dice,0,5-i)} optiondown ={canMovePiece(board,dice,0,18+i)} onClick={handleClick} upIndex={5-i} downIndex={18+i}  />
         ))}
         </div>
 
