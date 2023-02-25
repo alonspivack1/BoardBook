@@ -1,7 +1,7 @@
 const dropDice = (board,player)=>{
 let Dice = GetDice()
 let BoolCanFinish = canPlay(board,Dice,player)
-return(Dice,BoolCanFinish)
+return {Dice: Dice, BoolCanFinish: BoolCanFinish};
 }
 
 //#region Dice
@@ -33,7 +33,12 @@ const hasEnemyPieces = (board,player,dice,pieceIndex=-1) =>{
             {
                 return true
             }
-        }   
+        }
+        else
+        {
+            return true
+        }
+
     }
     return false
 }
@@ -46,6 +51,9 @@ const hasPiece = (board,player,index)=>{
 //#endregion Board
 
 const canPlay = (board,dice,player) =>{
+
+    console.log("board",board)
+    console.log("player",player)
 
     if(board[player].eaten>0)
     {
@@ -146,18 +154,49 @@ const canTakeOutPiece = (board,dice,player)=>{
 const canMoveAnyPiece = (board,dice,player)=>{
     for (let i = 0;i<4;i++)
     {
-        for (let j = 0;j<23;j++)
+        if(isAvailableDice(dice[i]))
         {
-            if(hasPiece(board,player,j))
+            for (let j = 0;j<23;j++)
             {
-                if(!hasEnemyPieces(board,player,dice[i],j))
-                return true  
-            }         
-        }       
+                
+                if(hasPiece(board,player,j))
+                {
+                    if(!hasEnemyPieces(board,player,dice[i],j))
+                    return true  
+                }         
+            }
+        }
+            
     }
     return false
 
 }
+
+const canMovePiece = (board,dice,player,index)=>{
+    if(dice)
+    {
+        console.log("Dice",dice)
+
+        for (let i = 0;i<4;i++)
+        {
+
+            if(isAvailableDice(dice[i]))
+            {
+                if(hasPiece(board,player,index))
+                {
+                    if(!hasEnemyPieces(board,player,dice[i],index))
+                    return true  
+                }     
+            }
+                   
+                  
+        }
+    }
+
+    return false
+
+}
+
 const GetDice = ()=>{
     let Dice=[{},{},{},{}]
         Dice[0] = {number:(Math.floor(Math.random() * 6)+1),used:false}
@@ -197,13 +236,5 @@ const Move = (board,player,indexStart,indexEnd)=>
 }
 
 
-
-
-
-
-
-
-
-
 //#endregion Actions
-export  {dropDice,Move,GetBoard}
+export  {dropDice,Move,GetBoard,canMovePiece}
