@@ -1,7 +1,7 @@
 const dropDice = (board,player)=>{
 let Dice = GetDice()
 let BoolCanFinish = canPlay(board,Dice,player)
-return {Dice: Dice, BoolCanFinish: BoolCanFinish};
+return {Dice: Dice, BoolCanFinish: !BoolCanFinish};
 }
 
 //#region Dice
@@ -13,6 +13,17 @@ const isAvailableDice =(dice)=>{
     return false
 }
 
+const updateDice =(dice,number)=>{
+    for (let i = 0;i<4;i++)
+    {
+         if(dice[i].number===number&&dice[i].used===false)
+         {
+            dice[i].used=true
+            break
+         }        
+    }   
+    return dice
+}
 //#endregion Dice
 
 //#region Board
@@ -54,11 +65,13 @@ const canPlay = (board,dice,player) =>{
 
     console.log("board",board)
     console.log("player",player)
+    console.log("0")
 
     if(board[player].eaten>0)
     {
         if(canReturnEatenPiece(board,dice,player))
         {
+            console.log("1")
             return true
         }
         else
@@ -72,6 +85,9 @@ const canPlay = (board,dice,player) =>{
         {
             if(canMoveInHome(board,dice,player)||canTakeOutPiece(board,dice,player))
             {
+                console.log("2canMoveInHome ",canMoveInHome(board,dice,player))
+                console.log("2canTakeOutPiece ",canTakeOutPiece(board,dice,player))
+
                return true 
             }
             else
@@ -83,6 +99,7 @@ const canPlay = (board,dice,player) =>{
         {
             if(canMoveAnyPiece(board,dice,player))
             {
+                console.log("3")
                 return true
             }
             else
@@ -94,6 +111,11 @@ const canPlay = (board,dice,player) =>{
 }
 
 const canReturnEatenPiece = (board,dice,player)=>{
+
+        if(board[player].eaten===0)
+        {
+            return false
+        }
 
         for (let i = 0;i<4;i++)
         {
@@ -122,34 +144,74 @@ const canMoveInHome = (board,dice,player)=>{
 
         for (let i = 0;i<4;i++)
         {
-            for (let j = 18;j<23;j++)
+            if(isAvailableDice(dice[i]))
             {
-                if(hasPiece(board,player,j))
+                for (let j = 18;j<23;j++)
                 {
-                    if(!hasEnemyPieces(board,player,dice[i],j))
-                    return true   
-                }       
-            }       
+                    if(hasPiece(board,player,j))
+                    {
+                        if(!hasEnemyPieces(board,player,dice[i],j))
+                        return true   
+                    }       
+                }  
+            }
+                
         }
         return false
 }
 const canTakeOutPiece = (board,dice,player)=>{
     for (let i = 0;i<4;i++)
     {
-        if(hasPiece(board,player,24-dice[i].number)){
-            return true
-        }
-        else
+        if(isAvailableDice(dice[i]))
         {
-            for(let j = dice[i].number; j <= 6;j++)
+            if(hasPiece(board,player,24-dice[i])){
+                return true
+            }
+            else
             {
-                if(hasPiece(board,player,24-j)){
-                    return false
+                let DiceIsOk=true
+                for(let j = 24-dice[i].number; j >= 18;j--)
+                {
+                    if(hasPiece(board,player,j)){
+                        DiceIsOk=false
+                }
+                if(DiceIsOk)
+                    return true
+                }    
             }
-            }
-            return true
         }
-    }
+        }
+    return false
+}
+const canTakeOutSpecificPiece = (board,index,player,dice)=>{
+  
+   
+    for (let i = 0;i<4;i++)
+    {
+        if(isAvailableDice(dice[i]))
+        {
+            if(hasPiece(board,player,index)&&24-dice[i].number===index){
+                return true
+            }
+            else
+            {
+                if(24-dice[i]<index)
+                {
+                    let DiceIsOk=true
+                    for(let j = 24-dice[i].number; j < index;j++)
+                    {
+                        if(hasPiece(board,player,j)){
+                            DiceIsOk=false
+                    }
+                    if(DiceIsOk)
+                        return true
+                    }
+                }
+            }
+        }
+        }
+    return false
+    
 }
 const canMoveAnyPiece = (board,dice,player)=>{
     for (let i = 0;i<4;i++)
@@ -173,10 +235,9 @@ const canMoveAnyPiece = (board,dice,player)=>{
 }
 
 const canMovePiece = (board,dice,player,index)=>{
-    if(dice)
+    if(dice&&board[player].eaten===0)
     {
-        console.log("Dice",dice)
-
+        
         for (let i = 0;i<4;i++)
         {
 
@@ -196,6 +257,25 @@ const canMovePiece = (board,dice,player,index)=>{
     return false
 
 }
+const canPlaceIndexes = (board,dice,player,index)=>{
+    let indexes =[]
+    if(dice)
+    {
+        for (let i = 0;i<4;i++)
+        {
+
+            if(isAvailableDice(dice[i]))
+            {
+                if(hasPiece(board,player,index)||index===-1)
+                {
+                    if(!hasEnemyPieces(board,player,dice[i],index)||index===-1)
+                    indexes.push(index+dice[i].number)
+                }     
+            } 
+        }
+    }
+    return indexes
+}
 
 const GetDice = ()=>{
     let Dice=[{},{},{},{}]
@@ -214,28 +294,63 @@ const GetDice = ()=>{
     return Dice
 }
 const GetBoard = ()=>{
-    let Board = [{data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0},{data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0}]
+//    let Board = [{data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0},{data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0}]
+let Board = [{data:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],eaten:0,outside:18},{data:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],eaten:0,outside:0}]
+
     return Board
 }  
 //#region Actions
 const Move = (board,player,indexStart,indexEnd)=>
 {
-    if(board[enemyPlayer(player)].data[23-indexEnd]===0)
-    {
-        board[player].data[indexStart]-=1
-        board[player].data[indexEnd]+=1
-    }   
+    console.log("MOVE!")
+    console.log("player",player)
+    console.log("indexStart",indexStart)
+    console.log("indexEnd",indexEnd)
 
-    if(board[enemyPlayer(player)].data[23-indexEnd]===1)
+    if(indexEnd===24)
     {
         board[player].data[indexStart]-=1
-        board[player].data[indexEnd]+=1
-        board[enemyPlayer(player)].data[23-indexEnd]=0
-        board[enemyPlayer(player)].eaten+=1
+        board[player].outside+=1
     }
+    else
+    {
+        if (indexStart!==-1)
+        {
+        if(board[enemyPlayer(player)].data[23-indexEnd]===0)
+        {
+            board[player].data[indexStart]-=1
+            board[player].data[indexEnd]+=1
+        }   
+    
+        if(board[enemyPlayer(player)].data[23-indexEnd]===1)
+        {
+            board[player].data[indexStart]-=1
+            board[player].data[indexEnd]+=1
+            board[enemyPlayer(player)].data[23-indexEnd]=0
+            board[enemyPlayer(player)].eaten+=1
+        }
+        }
+        else{
+            if(board[enemyPlayer(player)].data[23-indexEnd]===0)
+            {
+                board[player].eaten-=1
+                board[player].data[indexEnd]+=1
+            }   
+        
+            if(board[enemyPlayer(player)].data[23-indexEnd]===1)
+            {
+                board[player].eaten-=1
+                board[player].data[indexEnd]+=1
+                board[enemyPlayer(player)].data[23-indexEnd]=0
+                board[enemyPlayer(player)].eaten+=1
+            }
+        }
+    }
+    
     return board
+
 }
 
 
 //#endregion Actions
-export  {dropDice,Move,GetBoard,canMovePiece}
+export  {dropDice,Move,GetBoard,canMovePiece,canPlaceIndexes,updateDice,canPlay,canReturnEatenPiece,canTakeOutSpecificPiece,allPiecesInHome}

@@ -5,7 +5,7 @@ function BackGammon() {
   return (
     <>
         <div>BackGammon</div>
-    <BackgammonBoard turn = {true}/>
+    <BackgammonBoard turn = {true} player ={0}/>
     </>
 
   )
