@@ -8,10 +8,26 @@ const GameSchema = mongoose.Schema(
       required: true,
       default: true,
     },
-    score:{
-        type:Number,
+    board:{
+        type:Array,
         required:true,
-    }
+    },
+    dice:{
+      type:Array,
+      required:true,
+  },
+  undo:{
+    type:Array,
+    required:true,
+},
+  canDropDice:{
+    type:Boolean,
+    required:true,
+  },
+  canFinish:{
+    type:Boolean,
+    required:true,
+  }
   },
   {
     timestamps: true,

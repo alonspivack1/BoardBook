@@ -1,12 +1,19 @@
-import React, { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
+import React from "react";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GameOfferToastStyle } from "../styles/GameOfferToastStyle";
-const GameOfferToast = (id,username) => {
-  const handleButtonAccept = () => {
-    window.open(`/gameroom/${id}`)
-    toast.dismiss(id);
-
+import { setGameIdToUserRoute } from "../utils/APIRoutes";
+const GameOfferToast = (id,username,currentId) => {
+  const handleButtonAccept = async() => {
+       await axios.post(setGameIdToUserRoute, {
+         id: currentId,
+         gameId:id
+     }).then((res)=>
+     {
+      window.open(`/gameroom/${res.data.gameId}`)
+      toast.dismiss(id);
+     })
 
   };
   const handleButtonDecline = () => {

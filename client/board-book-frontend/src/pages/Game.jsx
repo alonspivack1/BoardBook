@@ -2,8 +2,9 @@ import React, {useEffect,useState,useRef, useContext} from 'react'
 import { useParams } from 'react-router-dom';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getRoomRoute,updateGameRoute,getUserByTokenRoute,host} from "../utils/APIRoutes";
+import { getRoomRoute,updateGameRoute,getUserByTokenRoute} from "../utils/APIRoutes";
 import { SocketContext } from '../services/socket';
+import BackgammonBoard from '../components/Backgammon/BackgammonBoard';
 
 export default function Game() {
     const enemy = useRef();
@@ -16,21 +17,17 @@ export default function Game() {
     const [roomData,setRoomData] = useState(undefined)
     const [currentUser,setCurrentUser] = useState(undefined)
     const [response,setResponse] = useState(undefined)
-    const ADD_GAME_USER = useRef()
+    const [board,setBoard] = useState()
+    const [dice,setDice] = useState()
+    const[undo,setUndo] = useState()
+    const[canDropDice,setCanDropDice] = useState(true)
+    const[canFinish,setCanFinish] = useState()
  
-    const closeTab = () => {
-      window.opener = null;
-      window.open("", "_self");
-      window.close();
-    };
+    
     useEffect(() => {
       if(currentUser)
       {
-        socket.emit("add-game-user",currentUser._id,process.env.REACT_APP_STATUS_INGAME)
- 
-
-        
-
+        socket.emit("add-game-user",currentUser._id,process.env.REACT_APP_STATUS_INGAME,roomId)
       }
       
     },[socket,currentUser]);
@@ -38,13 +35,18 @@ export default function Game() {
     useEffect(()=>{
       if(socket&&roomData&&roomId)
       {   
-          console.log(roomId)
           socket.off(`${roomId}`)
-          socket.on(`${roomId}`,(board)=>
+          socket.on(`${roomId}`,(data)=>
         {
           let temproom = {...roomData}
-          temproom.score = board
-          temproom.turn = !roomData.turn
+          temproom.board = data.board
+          temproom.turn = data.turn
+
+
+          temproom.dice = data.dice
+          temproom.undo = data.undo
+          temproom.canDropDice = data.canDropDice
+          temproom.canFinish = data.canFinish
           setRoomData(temproom)
         })
     }},[roomData,socket,roomId]) 
@@ -56,7 +58,7 @@ export default function Game() {
           if (!localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)) {
             navigate("/login");
           } else {
-            const token =await localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)
+            const token = localStorage.getItem(process.env.REACT_APP_USER_LOCALSTORAGE_TOKEN)
             const data = await axios.get(`${getUserByTokenRoute}/${token}`);   
             if(!data)
             {
@@ -87,11 +89,15 @@ export default function Game() {
 
     useEffect(()=>{
       if (currentUser&&response&&roomData) {
-
+        setBoard(roomData.board)
+        setDice(roomData.dice)
+        setUndo(roomData.undo)
+        setCanDropDice(roomData.canDropDice)       
+        setCanFinish(roomData.canFinish)
+        
         if(currentUser._id === roomData.users[0])
         {
           player.current=true
-          console.log("2")
           moveTurnTo.current = false
           enemy.current=roomData.users[1]
           if (roomData.turn===true)
@@ -106,7 +112,6 @@ export default function Game() {
         else if (roomData.users[1] === currentUser._id)
         {
           player.current=true
-          console.log("3")
           moveTurnTo.current = true
           enemy.current=roomData.users[0]
           if (roomData.turn===false)
@@ -124,27 +129,58 @@ export default function Game() {
       } 
     },[roomData])
 
- 
+    const handleFinishTurn= async (board)=>{
+      dice[0].used=true;
+      dice[1].used=true;
+      dice[2].used=true;
+      dice[3].used=true;
 
-      const ClickHandler = async ()=>{
+      if(player.current===true&&yourTurn.current===true)
+      {
+       await axios.post(updateGameRoute, {
+         roomId: roomId,
+         board: board,
+         turn:moveTurnTo.current,
+         dice:dice,
+         undo:[],
+         canDropDice:true,
+         canFinish:false,
+       }
+       ).then((ex)=>{
+         if(ex.data.updateSuccessful)
+         {UpdateBoard(board,(moveTurnTo.current),dice,[],true,false)}
+        })
+      }
+   }
+
+      const handleUpdateBoard= async (board,dice,undo,canDropDice,canFinish)=>{
          if(player.current===true&&yourTurn.current===true)
          {
           await axios.post(updateGameRoute, {
             roomId: roomId,
-            score: 1,
-            turn:moveTurnTo.current
+            board: board,
+            dice:dice,
+            undo:undo,
+            canDropDice:canDropDice,
+            canFinish:canFinish,
           }
           ).then((ex)=>{
             if(ex.data.updateSuccessful)
-              {UpdateBoard()}
+              {UpdateBoard(board,!moveTurnTo.current,dice,undo,canDropDice,canFinish)}
            })
          }
       }
 
-        const UpdateBoard = ()=>{
+        const UpdateBoard = (board,turn,dice,undo,canDropDice,canFinish)=>{
           socket.emit("set-board",{
-          roomId:roomId,
-          board:roomData.score+1
+            roomId: roomId,
+            board: board,
+            turn:turn,
+            dice:dice,
+            undo:undo,
+            canDropDice:canDropDice,
+            canFinish:canFinish,
+
         })  
       }
 
@@ -154,7 +190,10 @@ export default function Game() {
         <>
           <h1>Game {roomId}</h1> 
         {
-          roomData?<button onClick={ClickHandler}>yourTurn {yourTurn.current} {roomData.score}</button>:""
+         <>
+{            board?(<BackgammonBoard undo={undo} setUndo={setUndo} canDropDice={canDropDice} setCanDropDice={setCanDropDice} setCanFinish={setCanFinish} canFinish={canFinish} dice ={dice} setDice={setDice} handleFinishTurn = {handleFinishTurn} handleUpdateBoard={handleUpdateBoard} board={board} setBoard={setBoard} turn ={yourTurn.current} player={moveTurnTo.current===false?0:1}/>):"Loading..."
+}         
+         </>
         }
         </>
  

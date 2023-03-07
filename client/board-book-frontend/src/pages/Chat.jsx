@@ -1,8 +1,8 @@
-import React, { useEffect, useState,useRef, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { ChatContainerStyle } from "../styles/StyledComponents";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getUserByTokenRoute,allContactsRoute ,createRoomRoute,changeChatRoute,setGameIdToUserRoute} from "../utils/APIRoutes";
+import { getUserByTokenRoute,allContactsRoute ,createRoomRoute,changeChatRoute} from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
 import ChatContainer from "../components/ChatContainer";
 import { SocketContext } from "../services/socket";
@@ -84,7 +84,7 @@ import { ValidationToast } from "../styles/ValidationToast";
       })   
       socket.on("game-offer",(data)=>
       {
-        GameOfferToast(data.roomId,data.from)
+        GameOfferToast(data.roomId,data.from,data.to)
       })  
     }
   },[socket,contacts])

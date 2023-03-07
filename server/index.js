@@ -2,13 +2,12 @@ const express = require("express");
 const cors = require("cors")
 const mongoose = require("mongoose")
 const socket = require("socket.io")
-const User = require("./model/userModel")
 
 //userRoutes.js
 const userRoutes = require("./routes/userRoutes")
 const messageRoutes = require("./routes/messageRoutes")
 const gameRoutes = require("./routes/gameRoutes");
-const { changeStatus } = require("./controllers/usersController");
+const { changeStatus, changeGameIdToUser } = require("./controllers/usersController");
 
 
 const app = express();
@@ -87,10 +86,11 @@ const io = socket(server,
             console.log(onlineUsers)
             changeStatusAndEmit(userId,status,true,false)
         });
-        socket.on("add-game-user",(userId,status)=>
+        socket.on("add-game-user",(userId,status,roomId)=>
         {
                 onGameUsers[userId] = socket.id;
                 changeStatusAndEmit(userId,status,true,false)
+                changeGameIdToUser(userId,roomId)
         });
         socket.on("send-msg",(data)=>
         {
@@ -103,9 +103,9 @@ const io = socket(server,
         });
         socket.on("set-board",(data)=>
         {
-               console.log(data.roomId)
-                socket.emit(`${data.roomId}`,data.board)
-                socket.broadcast.emit(`${data.roomId}`,data.board)
+
+                socket.emit(`${data.roomId}`,{board:data.board,dice:data.dice,turn:data.turn,undo:data.undo,canDropDice:data.canDropDice,canFinish:data.canFinish})
+                socket.broadcast.emit(`${data.roomId}`,{board:data.board,dice:data.dice,turn:data.turn,undo:data.undo,canDropDice:data.canDropDice,canFinish:data.canFinish})
         });
         socket.on("logout",(id)=>{
             //! NEED FORCE EXIT FROM GAME!
@@ -128,13 +128,14 @@ const io = socket(server,
             const sendUserSocket = onlineUsers[data.to]
             socket.to(sendUserSocket).emit("game-offer",{
                 from:data.from,
-                roomId:data.roomId
+                roomId:data.roomId,
+                to:data.to
+
             })
 
         })
       
            socket.on('disconnect', function(){
-            console.log("1")
             let id
             for (let key in onlineUsers) {
                 if(onlineUsers[key]===socket.id)
@@ -172,7 +173,6 @@ const io = socket(server,
                         }
                         else
                         {
-                            console.log("2")
                             changeStatusAndEmit(id,process.env.STATUS_ONLINE,true,true)
                             delete onGameUsers[id];
                             break;

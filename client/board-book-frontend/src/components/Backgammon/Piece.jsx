@@ -1,6 +1,5 @@
 import React from 'react'
 import './BackgammonBoard.css';
-import { GetBoard, Move } from './BackGammonLogic';
 
 function Piece({count=0,up=true,mainPlayer=true,canPickUp=true}) {
     let margin;
@@ -8,9 +7,6 @@ function Piece({count=0,up=true,mainPlayer=true,canPickUp=true}) {
     up?changeMargin=25:changeMargin=-25;
     up?margin=-270:margin=380;
 
-    const handleClick =()=>{
-  
-    }
   return (
     <>
     {mainPlayer?

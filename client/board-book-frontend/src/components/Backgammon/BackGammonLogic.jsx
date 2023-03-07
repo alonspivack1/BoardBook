@@ -119,8 +119,12 @@ const canReturnEatenPiece = (board,dice,player)=>{
 
         for (let i = 0;i<4;i++)
         {
-             if(!hasEnemyPieces(board,player,dice[i]))
-                return true          
+            if(isAvailableDice(dice[i]))
+            {
+                if(!hasEnemyPieces(board,player,dice[i]))
+                return true  
+            }
+                     
         }   
         return false
 }
@@ -268,8 +272,13 @@ const canPlaceIndexes = (board,dice,player,index)=>{
             {
                 if(hasPiece(board,player,index)||index===-1)
                 {
-                    if(!hasEnemyPieces(board,player,dice[i],index)||index===-1)
-                    indexes.push(index+dice[i].number)
+                    if(!hasEnemyPieces(board,player,dice[i],index))
+                    {
+                        if(player===0)
+                        { indexes.push((index+dice[i].number))}
+                        else{ indexes.push(23-(index+dice[i].number))}
+                    }
+                   
                 }     
             } 
         }
@@ -288,15 +297,14 @@ const GetDice = ()=>{
         }
         else
         {
-            Dice[2] = {number:0,used:false}
-            Dice[3] = {number:0,used:false}
+            Dice[2] = {number:0,used:true}
+            Dice[3] = {number:0,used:true}
         }
     return Dice
 }
 const GetBoard = ()=>{
-//    let Board = [{data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0},{data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0}]
-let Board = [{data:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],eaten:0,outside:18},{data:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],eaten:0,outside:0}]
-
+    let Board = [{data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0},
+                 {data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0}]
     return Board
 }  
 //#region Actions

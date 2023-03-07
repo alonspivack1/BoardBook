@@ -171,6 +171,7 @@ module.exports.changeStatus = async (id,status,returnContactsList,deleteGameID=f
       if(deleteGameID===true)
       {
         await DeleteGameRoom(user.gameId)
+        console.log(`deleted gameId to ${user.username} from ${user.gameId}`)
         user.gameId=""}
         await user.save();  
       if(returnContactsList===true)
@@ -189,13 +190,16 @@ module.exports.changeStatus = async (id,status,returnContactsList,deleteGameID=f
   }
   catch(ex){}
   }
+  //!move to gameController
   const DeleteGameRoom = async (gameId)=>{
     if(gameId&&gameId!=="")
     {
       const game = await Game.findById(gameId);
       const user1 = await User.findById(game.users[0]);
       const user2 = await User.findById(game.users[1]);
-      if(user1.gameId==="",user2.gameId==="")
+      console.log("user1.gameId = ",user1.gameId)
+      console.log("user2.gameId = ",user2.gameId)
+      if(user1.gameId===""&&user2.gameId==="")
       {
         console.log("deleted=>",gameId)
         await game.delete()
@@ -255,12 +259,19 @@ module.exports.changeStatus = async (id,status,returnContactsList,deleteGameID=f
     });
   }
 };
-module.exports.gameIdToUser = async(req, res, next) => {
+module.exports.gameIdToUser = async(req, res, next) => 
+{ 
   const{id,gameId} = req.body;
   const user = await User.findById(id)
   user.gameId = gameId
   await user.save()
-  return
+  return res.json({gameId:gameId})
 
+}
+module.exports.changeGameIdToUser = async(id,gameId)=>{
+  const user = await User.findById(id)
+  user.gameId = gameId
+  await user.save()
+  return gameId
 }
 
