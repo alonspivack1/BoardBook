@@ -115,9 +115,6 @@ import { ValidationToast } from "../styles/ValidationToast";
 
     }
   
-  const handleGameOffer = () => {
-  
-  };
   const handleContacts = async (id) => {
     let updatedContacts = [...contacts]
     const index = updatedContacts.findIndex(user => user._id === id);

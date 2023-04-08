@@ -16,10 +16,6 @@ const GameSchema = mongoose.Schema(
       type:Array,
       required:true,
   },
-  undo:{
-    type:Array,
-    required:true,
-},
   canDropDice:{
     type:Boolean,
     required:true,

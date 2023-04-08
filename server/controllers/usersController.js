@@ -12,7 +12,7 @@ module.exports.register = async (req,res,next) =>{
   try
   {
     const{username,password,email,AvatarImage} = req.body;
-    const usernameCheck = await User.findOne({username});
+    const usernameCheck = await User.findOne({username: {$regex: new RegExp('^' + username + '$', 'i')}});
     if(usernameCheck)
         return res.json({msg:"Username already used", status:false})
     const emailCheck = await User.findOne({email});

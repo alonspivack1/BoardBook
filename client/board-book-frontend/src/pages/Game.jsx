@@ -19,9 +19,9 @@ export default function Game() {
     const [response,setResponse] = useState(undefined)
     const [board,setBoard] = useState()
     const [dice,setDice] = useState()
-    const[undo,setUndo] = useState()
     const[canDropDice,setCanDropDice] = useState(true)
     const[canFinish,setCanFinish] = useState()
+    const[winner,setWinner] = useState(undefined)
  
     
     useEffect(() => {
@@ -41,12 +41,10 @@ export default function Game() {
           let temproom = {...roomData}
           temproom.board = data.board
           temproom.turn = data.turn
-
-
           temproom.dice = data.dice
-          temproom.undo = data.undo
           temproom.canDropDice = data.canDropDice
           temproom.canFinish = data.canFinish
+          setWinner(data.winner)
           setRoomData(temproom)
         })
     }},[roomData,socket,roomId]) 
@@ -73,6 +71,7 @@ export default function Game() {
           }
         } catch (error) {
           console.error(error);
+          navigate("/login");
         }
       }
       getGameRoom(roomId);
@@ -91,7 +90,6 @@ export default function Game() {
       if (currentUser&&response&&roomData) {
         setBoard(roomData.board)
         setDice(roomData.dice)
-        setUndo(roomData.undo)
         setCanDropDice(roomData.canDropDice)       
         setCanFinish(roomData.canFinish)
         
@@ -134,7 +132,6 @@ export default function Game() {
       dice[1].used=true;
       dice[2].used=true;
       dice[3].used=true;
-
       if(player.current===true&&yourTurn.current===true)
       {
        await axios.post(updateGameRoute, {
@@ -142,46 +139,45 @@ export default function Game() {
          board: board,
          turn:moveTurnTo.current,
          dice:dice,
-         undo:[],
          canDropDice:true,
          canFinish:false,
        }
        ).then((ex)=>{
          if(ex.data.updateSuccessful)
-         {UpdateBoard(board,(moveTurnTo.current),dice,[],true,false)}
+         {UpdateBoard(board,(moveTurnTo.current),dice,true,false)}
         })
       }
    }
 
-      const handleUpdateBoard= async (board,dice,undo,canDropDice,canFinish)=>{
+      const handleUpdateBoard= async (board,dice,canDropDice,canFinish)=>{
          if(player.current===true&&yourTurn.current===true)
          {
           await axios.post(updateGameRoute, {
             roomId: roomId,
             board: board,
             dice:dice,
-            undo:undo,
             canDropDice:canDropDice,
             canFinish:canFinish,
           }
+          
           ).then((ex)=>{
+         
             if(ex.data.updateSuccessful)
-              {UpdateBoard(board,!moveTurnTo.current,dice,undo,canDropDice,canFinish)}
+              {UpdateBoard(board,!moveTurnTo.current,dice,canDropDice,canFinish)}
            })
          }
       }
 
-        const UpdateBoard = (board,turn,dice,undo,canDropDice,canFinish)=>{
+        const UpdateBoard = (board,turn,dice,canDropDice,canFinish)=>{
           socket.emit("set-board",{
             roomId: roomId,
             board: board,
             turn:turn,
             dice:dice,
-            undo:undo,
             canDropDice:canDropDice,
             canFinish:canFinish,
-
-        })  
+        }
+        )  
       }
 
 
@@ -191,7 +187,7 @@ export default function Game() {
           <h1>Game {roomId}</h1> 
         {
          <>
-{            board?(<BackgammonBoard undo={undo} setUndo={setUndo} canDropDice={canDropDice} setCanDropDice={setCanDropDice} setCanFinish={setCanFinish} canFinish={canFinish} dice ={dice} setDice={setDice} handleFinishTurn = {handleFinishTurn} handleUpdateBoard={handleUpdateBoard} board={board} setBoard={setBoard} turn ={yourTurn.current} player={moveTurnTo.current===false?0:1}/>):"Loading..."
+{            winner===undefined?board?(<BackgammonBoard canDropDice={canDropDice} setCanDropDice={setCanDropDice} setCanFinish={setCanFinish} canFinish={canFinish} dice ={dice} setDice={setDice} handleFinishTurn = {handleFinishTurn} handleUpdateBoard={handleUpdateBoard} board={board} setBoard={setBoard} turn ={yourTurn.current} player={moveTurnTo.current===false?0:1}/>):"Loading...":`The winner is -> ${winner}}`
 }         
          </>
         }

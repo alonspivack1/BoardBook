@@ -138,7 +138,7 @@ const allPiecesInHome = (board,player)=>{
         }
         counter+=board[player].outside
 
-        if(counter===24)
+        if(counter===15)
             return true
         else
             return false
@@ -302,11 +302,7 @@ const GetDice = ()=>{
         }
     return Dice
 }
-const GetBoard = ()=>{
-    let Board = [{data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0},
-                 {data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0}]
-    return Board
-}  
+
 //#region Actions
 const Move = (board,player,indexStart,indexEnd)=>
 {
@@ -361,4 +357,4 @@ const Move = (board,player,indexStart,indexEnd)=>
 
 
 //#endregion Actions
-export  {dropDice,Move,GetBoard,canMovePiece,canPlaceIndexes,updateDice,canPlay,canReturnEatenPiece,canTakeOutSpecificPiece,allPiecesInHome}
+export  {dropDice,Move,canMovePiece,canPlaceIndexes,updateDice,canPlay,canReturnEatenPiece,canTakeOutSpecificPiece,allPiecesInHome}

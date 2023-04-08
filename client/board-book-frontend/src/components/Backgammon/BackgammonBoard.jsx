@@ -7,7 +7,7 @@ import ArrowUp from './ArrowUp';
 import ArrowDown from './ArrowDown';
 import EndBar from './EndBar';
 
-function BackgammonBoard({undo,setUndo,canDropDice,setCanDropDice,canFinish,setCanFinish,dice,setDice,handleFinishTurn,handleUpdateBoard,board,setBoard,turn,player}) {
+function BackgammonBoard({canDropDice,setCanDropDice,canFinish,setCanFinish,dice,setDice,handleFinishTurn,handleUpdateBoard,board,setBoard,turn,player}) {
     const[placeIndexes,setPlaceIndexes] = useState([])
     const[heldIndex,setHeldIndex] = useState()
     const[canOutside,setCanOutside] = useState(false)
@@ -19,7 +19,7 @@ function BackgammonBoard({undo,setUndo,canDropDice,setCanDropDice,canFinish,setC
             let dropdice= dropDice(board,0)
             setDice(dropdice.Dice)
             setCanFinish(dropdice.BoolCanFinish)
-            handleUpdateBoard(board,dropdice.Dice,undo,false,!canPlay(board,dropdice.Dice,player))
+            handleUpdateBoard(board,dropdice.Dice,false,!canPlay(board,dropdice.Dice,player))
         }
     }
 
@@ -30,17 +30,6 @@ const handleFinish = (board)=>{
         setCanFinish(false)
         handleFinishTurn(board)
     }
-}
-const handleUndo = ()=>{
-    let tempUndo = undo
-    let tempPop = tempUndo.pop()
-    setPlaceIndexes([])
-    setBoard(tempPop)
-    setUndo(tempUndo)
-    setCanFinish((!canPlay(tempPop,dice,player)))
-    setCanOutside(false)
-    setHeldIndex()
-    handleUpdateBoard(tempPop,dice,tempUndo,false,!canPlay(tempPop,dice,player))
 }
 
 
@@ -53,10 +42,8 @@ const handlePickUp = (player,index)=>{
 
 }
 const handlePlace = (index)=>{
-    let tempUndo = undo
     const tempBoard = board
-    tempUndo.push(tempBoard)
-    setUndo(tempUndo)
+
     let temp =Move(board,player,heldIndex,index)
     setPlaceIndexes([])
     setBoard(temp)
@@ -64,14 +51,13 @@ const handlePlace = (index)=>{
     setCanFinish((!canPlay(board,dice,player)))
     setCanOutside(false)
     setHeldIndex()
-    handleUpdateBoard(board,dice,undo,canDropDice,!canPlay(board,dice,player))
+    handleUpdateBoard(board,dice,canDropDice,!canPlay(board,dice,player))
 }
 
   return (
     <>
         <button onClick={()=>handleDropDice()} disabled={!(turn&&canDropDice)}>ROLL</button>
-        <button onClick={()=>handleUndo()} disabled={!(turn&&undo.length>0)}>UNDO</button> 
-        <button onClick={()=>handleFinish(board)} disabled={!(turn&&canFinish)}>FINIS</button>     
+        <button onClick={()=>handleFinish(board)} disabled={!(turn&&canFinish)}>FINISH</button> 
         <div className = "board">
         <div className = "space"></div>
 

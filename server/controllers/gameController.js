@@ -21,7 +21,6 @@ module.exports.addGameRoom = async (req, res, next) => {
       board: [{data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0},
       {data:[2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0],eaten:0,outside:0}],
       dice:[{number:6,used:true},{number:5,used:true},{number:0,used:true},{number:0,used:true}],
-      undo:[],
       canDropDice:true,
       canFinish:false
     });
@@ -41,16 +40,13 @@ module.exports.addGameRoom = async (req, res, next) => {
 
 module.exports.updateGame = async (req, res, next) => {
   try {
-    const { roomId, board,turn,dice,undo,canDropDice,canFinish } = req.body;
+    const { roomId, board,turn,dice,canDropDice,canFinish } = req.body;
     const update = { $set: { board } };
     if (turn !== undefined) {
       update.$set.turn = turn;
     }
     if (dice !== undefined) {
       update.$set.dice = dice;
-    }
-    if (undo !== undefined) {
-      update.$set.undo = undo;
     }
     if (canDropDice !== undefined) {
       update.$set.canDropDice = canDropDice;

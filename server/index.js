@@ -103,9 +103,17 @@ const io = socket(server,
         });
         socket.on("set-board",(data)=>
         {
-
-                socket.emit(`${data.roomId}`,{board:data.board,dice:data.dice,turn:data.turn,undo:data.undo,canDropDice:data.canDropDice,canFinish:data.canFinish})
-                socket.broadcast.emit(`${data.roomId}`,{board:data.board,dice:data.dice,turn:data.turn,undo:data.undo,canDropDice:data.canDropDice,canFinish:data.canFinish})
+                let winner = undefined
+                if(data.board[0].outside===15)
+                {
+                    winner="first user"
+                }
+                if(data.board[1].outside===15)
+                {
+                    winner="second user"
+                }
+                socket.emit(`${data.roomId}`,{board:data.board,dice:data.dice,turn:data.turn,canDropDice:data.canDropDice,canFinish:data.canFinish,winner:winner})
+                socket.broadcast.emit(`${data.roomId}`,{board:data.board,dice:data.dice,turn:data.turn,canDropDice:data.canDropDice,canFinish:data.canFinish,winner:winner})
         });
         socket.on("logout",(id)=>{
             //! NEED FORCE EXIT FROM GAME!
